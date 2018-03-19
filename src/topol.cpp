@@ -1506,7 +1506,7 @@ class borderLine
             }
             else
             {
-              i1 = 0;
+              i2 = 0;
             }
             f = spring(bl[k][i1], bl[k][i], dampen);
             f = spring(bl[k][i], bl[k][i2], dampen);
@@ -1817,7 +1817,7 @@ class borderLine
       blSettings.inputFile = inputFile;
       blSettings.fname = outputFile;
       blSettings.ncycles = 0;
-      srand(time(0));
+      //srand(time(0));
       w = tw;         //keep a copy of the weights
       for (i = 0; i < tw.size(); i++){
         origw.insert(origw.end(), tw[i]);
@@ -2470,7 +2470,7 @@ class borderLine
       initPoint(&minP);
       point maxP;
       initPoint(&maxP);
-      printf("Starting...\n");
+      Rprintf("Starting...\n");
 
       // This loop is limited to maxRunningTime
       time_t start = time(NULL);
@@ -2478,7 +2478,7 @@ class borderLine
       for (i = blSettings.ncyclesInterrupted; i < it1; i++){
         setForces1();
         if (refreshScreen.isMax() == true){
-          writeSVG();
+          //writeSVG();
           time_t now = time(NULL);
           double elapsed = difftime(now, start);
           if (((UINT) elapsed) > blSettings.maxRunningTime){
@@ -2486,7 +2486,7 @@ class borderLine
             blSettings.signalEnd = false;
             i = it1;
           }
-          writeCoords();
+          //writeCoords();
         }
         refreshScreen++;
         if (i == (it1 - 1)){
@@ -2497,24 +2497,21 @@ class borderLine
       }
 
       setAsStable();
-      for (i = 0; i < 50; i++){
+      for (i = 0; i < it1; i++){
         setForces1();
         if (refreshScreen.isMax() == true){
-          writeSVG();
+          //writeSVG();
         }
         refreshScreen++;
         solve();
       }
-      printf("Refining...\n");
+      Rprintf("Refining...\n");
       UINT np = (UINT) (1.5f * (float) startPerim);
       interpolate(np);
       blSettings.margin /= 10;
       setRadii();
       for (i = 0; i < it2; i++){
         setForces2();
-        if (refreshScreen.isMax() == true){
-          writeSVG();
-        }
         solve(true);
       }
       //setForces3();

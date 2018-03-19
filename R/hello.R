@@ -27,6 +27,7 @@ NULL
 #' set2 <- c('e', 'f', 'c')
 #' set3 <- c('c', 'b', 'e')
 #' toVenn(set1, set2, set3)
+#' @export
 toVenn <- function(...){
   sets <- list(...)
   nBits <- length(sets)
@@ -60,9 +61,10 @@ toVenn <- function(...){
   }
   cat(result, sep="\n")
   mySVG <- drawVenn(result)
-  tfile <- "tmp.svg"
+  tfile <- tempfile(fileext = ".svg")
+  cat(tfile)
   cat(mySVG, file=tfile)
-  image_read(tfile)
+  magick::image_read(tfile)
   #viewer <- getOption("viewer")
   #if (!is.null(viewer)){
   #  viewer(tfile)
