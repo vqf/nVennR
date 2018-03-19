@@ -1,0 +1,18 @@
+Package: nVennR
+Type: Package
+Title: create n-Dimensional, Quasi-Proportional Venn Diagrams
+Version: 0.1.0
+Author: person("Victor", "Quesada", email = "quesadavictor@uniovi.es", role=c("aut", "cre"))
+Maintainer: Victor Quesada <quesadavictor@uniovi.es>
+Description: This package provides an interface for the nVenn algorithm
+    (https://doi.org/10.1093/bioinformatics/bty109). This algorithm works for any number of sets, and usually yields 
+    pleasing and informative diagrams. 
+    However, representing more than six sets takes a long time and is hard to interpret, unless many of the 
+    regions are empty. If you cannot make sense of the result, you may want to consider UpSetR
+    (https://cran.r-project.org/web/packages/UpSetR/README.html)
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+LinkingTo: Rcpp
+Imports: Rcpp
