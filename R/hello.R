@@ -59,6 +59,18 @@ toVenn <- function(...){
     result <- c(result, length(start))
   }
   cat(result, sep="\n")
+  mySVG <- drawVenn(result)
+  tfile <- "tmp.svg"
+  cat(mySVG, file=tfile)
+  image_read(tfile)
+  #viewer <- getOption("viewer")
+  #if (!is.null(viewer)){
+  #  viewer(tfile)
+  #}
+  #else{
+  #  utils::browseURL(tfile)
+  #}
+  #cat("Saved to ", tfile)
 }
 
 .toBin <- function(n, Nbits){

@@ -5,20 +5,20 @@
 
 using namespace Rcpp;
 
-// timesTwo
-NumericVector timesTwo(NumericVector x);
-RcppExport SEXP _nVennR_timesTwo(SEXP xSEXP) {
+// drawVenn
+StringVector drawVenn(StringVector x);
+RcppExport SEXP _nVennR_drawVenn(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(timesTwo(x));
+    Rcpp::traits::input_parameter< StringVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(drawVenn(x));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_nVennR_timesTwo", (DL_FUNC) &_nVennR_timesTwo, 1},
+    {"_nVennR_drawVenn", (DL_FUNC) &_nVennR_drawVenn, 1},
     {NULL, NULL, 0}
 };
 
