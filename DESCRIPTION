@@ -1,7 +1,7 @@
 Package: nVennR
 Type: Package
 Title: create n-Dimensional, Quasi-Proportional Venn Diagrams
-Version: 0.1.0
+Version: 0.1.0.9000
 Author: person("Victor", "Quesada", email = "quesadavictor@uniovi.es", role=c("aut", "cre"))
 Maintainer: Victor Quesada <quesadavictor@uniovi.es>
 Description: This package provides an interface for the nVenn algorithm
