@@ -17,18 +17,25 @@
 #' @importFrom Rcpp sourceCpp
 NULL
 
-#' Create Venn diagram using the nVenn algorithm.
+#' Create Venn diagram using the nVenn algorithm. This algorithm is based on a simulation
+#' that compacts the figure. To avoid clogging the system, the simulation stops every 7e3
+#' cycles and asks the user if it sould go on. Only answering 'y' continues. Once the
+#' diagram is compact, it will be slightly embellished. By default, the resulting figure
+#' is show at the viewer, but users can also capture the return value and call showVenn
+#' with other parameters.
 #'
+#' @param draw Show Venn diagram in the viewer as a side effect. Defaults to true.
 #' @param ... One list or vector (possibly mixed) per set. If the input
-#' is a list with a name, that name will be used for the legend
-#' @return Nothing. Creates a Venn diagram in svg as a side effect.
+#' is a list with a name, that name will be used for the legend.
+#' @return SVG code for the Venn diagram.
 #' @examples
 #' set1 <- c('a', 'b', 'c')
 #' set2 <- c('e', 'f', 'c')
 #' set3 <- c('c', 'b', 'e')
-#' toVenn(set1, set2, set3)
+#' mySVG <- toVenn(set1, set2, set3)
+#' showSVG(mySVG=mySVG, opacity=0.2)
 #' @export
-toVenn <- function(...){
+toVenn <- function(..., draw=TRUE){
   sets <- list(...)
   nBits <- length(sets)
   nRegions <- bitwShiftL(1, nBits)
@@ -61,19 +68,36 @@ toVenn <- function(...){
   }
   cat(result, sep="\n")
   mySVG <- drawVenn(result)
-  tfile <- tempfile(fileext = ".svg")
-  cat(tfile)
-  cat(mySVG, file=tfile)
-  magick::image_read(tfile)
-  #viewer <- getOption("viewer")
-  #if (!is.null(viewer)){
-  #  viewer(tfile)
-  #}
-  #else{
-  #  utils::browseURL(tfile)
-  #}
-  #cat("Saved to ", tfile)
+  if (draw) showSVG(mySVG)
+  return(mySVG)
 }
+
+
+#' Show Venn diagram. Automatically called from toVenn.
+#'
+#' @param mySVG SVG code defining the diagram. Can be retrieved from toVenn.
+#' @param opacity Fill opacity for the sets. Defaults to 0.4.
+#' @param outFile File name to save SVG figure. If empty, a temp file will be created and
+#' shown in the viewer, if possible.
+#' @param systemShow Show the result in the system SVG viewer.
+#' @return Nothing. Creates a Venn diagram in svg as a side effect.
+#' @export
+showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
+  tfile = outFile
+  if (tfile == "") tfile <- tempfile(fileext = ".svg")
+  # transform SVG
+  mySVG <- sub("fill-opacity: *([^ ;]+) *;", paste("fill-opacity: ", opacity, ";"), mySVG)
+  ###############
+  cat(mySVG, file=tfile)
+  s <- magick::image_read(tfile)
+  print(s)
+  if (systemShow){
+    utils::browseURL(tfile)
+  }
+  cat("Saved to ", tfile)
+}
+
+
 
 .toBin <- function(n, Nbits){
   result <- c()

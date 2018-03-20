@@ -2,23 +2,36 @@
 % Please edit documentation in R/hello.R
 \name{toVenn}
 \alias{toVenn}
-\title{Create Venn diagram using the nVenn algorithm.}
+\title{Create Venn diagram using the nVenn algorithm. This algorithm is based on a simulation
+that compacts the figure. To avoid clogging the system, the simulation stops every 7e3
+cycles and asks the user if it sould go on. Only answering 'y' continues. Once the
+diagram is compact, it will be slightly embellished. By default, the resulting figure
+is show at the viewer, but users can also capture the return value and call showVenn
+with other parameters.}
 \usage{
-toVenn(...)
+toVenn(..., draw = TRUE)
 }
 \arguments{
 \item{...}{One list or vector (possibly mixed) per set. If the input
-is a list with a name, that name will be used for the legend}
+is a list with a name, that name will be used for the legend.}
+
+\item{draw}{Show Venn diagram in the viewer as a side effect. Defaults to true.}
 }
 \value{
-Nothing. Creates a Venn diagram in svg as a side effect.
+SVG code for the Venn diagram.
 }
 \description{
-Create Venn diagram using the nVenn algorithm.
+Create Venn diagram using the nVenn algorithm. This algorithm is based on a simulation
+that compacts the figure. To avoid clogging the system, the simulation stops every 7e3
+cycles and asks the user if it sould go on. Only answering 'y' continues. Once the
+diagram is compact, it will be slightly embellished. By default, the resulting figure
+is show at the viewer, but users can also capture the return value and call showVenn
+with other parameters.
 }
 \examples{
 set1 <- c('a', 'b', 'c')
 set2 <- c('e', 'f', 'c')
 set3 <- c('c', 'b', 'e')
-toVenn(set1, set2, set3)
+mySVG <- toVenn(set1, set2, set3)
+showSVG(mySVG=mySVG, opacity=0.2)
 }

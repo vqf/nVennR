@@ -2171,12 +2171,17 @@ class borderLine
       for (l = 0; l < ngroups; l++){
         string g = groups[l];
         char myg[50]; sprintf(myg, "p%d", l);
+        char myq[50]; sprintf(myq, "q%d", l);
         char addRect[500];
+        char addQrect[500];
         sprintf(addRect, "<rect class=\"%s borderLine\" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" />",
                 myg, cx, cy, rw, rh);
+        sprintf(addQrect, "<rect class=\"%s\" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" />",
+                myq, cx, cy, rw, rh);
         char addLegend[500];
         sprintf(addLegend, "<text class=\"legend\" x=\"%.2f\" y=\"%.2f\">%s</text>", cx + dx, cy + rh, g.c_str());
         svg.addLine(addRect);
+        svg.addLine(addQrect);
         svg.addLine(addLegend);
         cy += dy;
       }
@@ -2452,59 +2457,35 @@ class borderLine
       initOlds();
     }
 
-    void writeSVG(){
-      string tmp = toSVG();
-      ofstream result;
-      result.open(blSettings.fname.c_str());
-      result.write(tmp.c_str(), tmp.size());
-      result.close();
 
-    }
 
     void simulate(int maxRel = 0)
     {
       UINT i;
       UINT it1 = (UINT) 7e3;
-      UINT it2 = (UINT) 2e2;
       point minP;
       initPoint(&minP);
       point maxP;
       initPoint(&maxP);
+      //udt.init(blSettings.startdt);
       Rprintf("Starting...\n");
 
-      // This loop is limited to maxRunningTime
-      time_t start = time(NULL);
-      if (blSettings.ncyclesInterrupted >= it1) blSettings.ncyclesInterrupted = 0;
-      for (i = blSettings.ncyclesInterrupted; i < it1; i++){
+      for (i = 0; i < it1; i++){
         setForces1();
-        if (refreshScreen.isMax() == true){
-          //writeSVG();
-          time_t now = time(NULL);
-          double elapsed = difftime(now, start);
-          if (((UINT) elapsed) > blSettings.maxRunningTime){
-            blSettings.ncyclesInterrupted = (UINT) i;
-            blSettings.signalEnd = false;
-            i = it1;
-          }
-          //writeCoords();
-        }
-        refreshScreen++;
-        if (i == (it1 - 1)){
-          blSettings.signalEnd = true;
-          blSettings.ncyclesInterrupted = it1;
-        }
         solve();
       }
 
-      setAsStable();
-      for (i = 0; i < it1; i++){
-        setForces1();
-        if (refreshScreen.isMax() == true){
-          //writeSVG();
-        }
-        refreshScreen++;
-        solve();
+
+      //setForces3();
+      UINT counter;
+      for (counter = 0; counter < dataDisplay.size(); counter++){
+        free(dataDisplay[counter]);
       }
+      dataDisplay.clear();
+    }
+    void refine(){
+      UINT i;
+      UINT it2 = (UINT) 2e2;
       Rprintf("Refining...\n");
       UINT np = (UINT) (1.5f * (float) startPerim);
       interpolate(np);
@@ -2514,15 +2495,15 @@ class borderLine
         setForces2();
         solve(true);
       }
-      //setForces3();
-      UINT counter;
-      for (counter = 0; counter < dataDisplay.size(); counter++){
-        free(dataDisplay[counter]);
-      }
-      dataDisplay.clear();
     }
-    };
+  };
 
+
+void fcall(StringVector x){
+  Environment env("package:nVennR");
+  Function f = env["showSVG"];
+  f(x);
+}
 
 // This is a simple example of exporting a C++ function to R. You can
 // source this function into an R session using the Rcpp::sourceCpp
@@ -2551,8 +2532,24 @@ StringVector drawVenn(StringVector x) {
   }
   binMap mymap(number);
   borderLine lines(&mymap, groupNames, weights);
+  bool goon = true;
+  Environment base = Environment("package:base");
+  Function readline = base["readline"];
+  Function as_char = base["as.character"];
   lines.simulate();
-
+  while (goon){
+    StringVector tr;
+    string thtml = lines.toSVG();
+    tr.push_back(thtml);
+    fcall(tr);
+    goon = false;
+    string yo = Rcpp::as<std::string>(as_char(readline("> More cycles? (y/n) ")));
+    if (yo == "y"){
+      goon = true;
+      lines.simulate();
+    }
+  }
+  lines.refine();
   //string html = "<html><body>" + lines.toSVG() + "</body></html>";
   string html = lines.toSVG();
   result.push_back(html);
