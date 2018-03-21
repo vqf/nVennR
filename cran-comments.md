@@ -5,7 +5,7 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 0 note
 
 * This is a new release.
 
@@ -15,9 +15,11 @@ This is a new release, so there are no reverse dependencies.
 
 ---
 
-* I have run R CMD check on the NUMBER downstream dependencies.
-  (Summary at ...). 
-  
-* FAILURE SUMMARY
+## Resubmission
 
-* All revdep maintainers were notified of the release on RELEASE DATE.
+This is a resubmission. In this version I have:
+
+* Changed the version number. 
+  
+* Added author-year citation before DOI.
+

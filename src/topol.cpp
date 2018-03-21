@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <time.h>
-#include <fstream>
+
 
 
 #define CIRCLE_MASS 200.0f
@@ -468,13 +468,6 @@ struct rgb
   float blue;
 };
 
-template<typename T>
-string toString(T input)
-{
-  ostream result;
-  result << input;
-  return result;
-}
 
 
 
@@ -1147,14 +1140,14 @@ class borderLine
   }
 }*/
 
-  void writeCoords(){
+ /* void writeCoords(){
     ofstream result;
     string outputFigData = blSettings.fname + ".data";
     fileText datafile = saveFigure();
     result.open(outputFigData.c_str());
     result.write(datafile.getText().c_str(), datafile.getText().size());
     result.close();
-  }
+ }*/
 
   point contact(point &p0, point &p1, float hardness = 5e1f)
   {
@@ -1902,7 +1895,7 @@ class borderLine
       return bl;
     }
 
-    void setCoords(string dataFile){
+    /*void setCoords(string dataFile){
       ifstream vFile;
       vFile.open(dataFile.c_str());
       UINT ncI = 0;
@@ -1949,7 +1942,7 @@ class borderLine
           }
         }
       }
-    }
+    }*/
 
     fileText saveFigure(){
       fileText result;
