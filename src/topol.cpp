@@ -148,6 +148,7 @@ typedef struct blData{
   float margin;
   float totalCircleV;
   float totalLineV;
+  float lrdt;
   int contacts;
   UINT ncycles;
   UINT maxRunningTime;
@@ -712,6 +713,7 @@ class borderLine
     b->minDx = 0;
     b->minDy = 0;
     b->startdt = 0;
+    b->lrdt = rdt;
     b->marginScale = 0.05f;
     b->margin = 0;
     b->totalCircleV = 0;
@@ -1267,7 +1269,7 @@ class borderLine
   }
 
   void setAsStable(){
-    rdt *= blSettings.stepdt;
+    blSettings.lrdt *= blSettings.stepdt;
     deciderCounter.setAsStable();
   }
 
@@ -1572,8 +1574,8 @@ class borderLine
     {
       bl = bl_old10;
       circles = circles_old10;
-      udt.report(rdt);
-      rdt *= blSettings.stepdt;
+      udt.report(blSettings.lrdt);
+      blSettings.lrdt *= blSettings.stepdt;
       deciderCounter = 0;
     }
     else if (blCounter == 0)
@@ -1586,9 +1588,9 @@ class borderLine
     }
     else if (deciderCounter.isMax())
     {
-      if (rdt/blSettings.stepdt < udt.unstabledt())
+      if (blSettings.lrdt/blSettings.stepdt < udt.unstabledt())
       {
-        rdt /= blSettings.stepdt;
+        blSettings.lrdt /= blSettings.stepdt;
       }
     }
     resetCircleRadius();
@@ -1626,12 +1628,12 @@ class borderLine
         }
         //
 
-        bl[i][j].vx += bl[i][j].fx * rdt / bl[i][j].mass;
-        bl[i][j].vy += bl[i][j].fy * rdt / bl[i][j].mass;
+        bl[i][j].vx += bl[i][j].fx * blSettings.lrdt / bl[i][j].mass;
+        bl[i][j].vy += bl[i][j].fy * blSettings.lrdt / bl[i][j].mass;
         blSettings.totalLineV += bl[i][j].vx * bl[i][j].vx + bl[i][j].vy * bl[i][j].vy;
 
-        bl[i][j].x += bl[i][j].vx * rdt;
-        bl[i][j].y += bl[i][j].vy * rdt;
+        bl[i][j].x += bl[i][j].vx * blSettings.lrdt;
+        bl[i][j].y += bl[i][j].vy * blSettings.lrdt;
         /*******/
         //attention(bl[i][j].x, bl[i][j].y, 0.1);
         /*******/
@@ -1665,13 +1667,13 @@ class borderLine
         circles[i].softenVel = false;
       }
       //
-      circles[i].vx += circles[i].fx * rdt / (CIRCLE_MASS);
-      circles[i].vy += circles[i].fy * rdt / (CIRCLE_MASS);
+      circles[i].vx += circles[i].fx * blSettings.lrdt / (CIRCLE_MASS);
+      circles[i].vy += circles[i].fy * blSettings.lrdt / (CIRCLE_MASS);
       blSettings.totalCircleV += circles[i].vx * circles[i].vx + circles[i].vy * circles[i].vy;
       //limitVel(circles[i], maxv);
 
-      circles[i].x += circles[i].vx * rdt;
-      circles[i].y += circles[i].vy * rdt;
+      circles[i].x += circles[i].vx * blSettings.lrdt;
+      circles[i].y += circles[i].vy * blSettings.lrdt;
       if (resetVelocity)
       {
         circles[i].vx = 0;
@@ -1805,7 +1807,7 @@ class borderLine
       blSettings.maxf = 5e20f;
       blSettings.maxv = 5e0f;
       blSettings.margin = 1.2 * ngroups * blSettings.marginScale;
-      blSettings.startdt = rdt;
+      blSettings.startdt = blSettings.lrdt;
       blSettings.stepdt = 0.6f;
       blSettings.inputFile = inputFile;
       blSettings.fname = outputFile;
@@ -2460,14 +2462,14 @@ class borderLine
       initPoint(&minP);
       point maxP;
       initPoint(&maxP);
-      //udt.init(blSettings.startdt);
+      udt.init(rdt);
       Rprintf("Starting...\n");
+
 
       for (i = 0; i < it1; i++){
         setForces1();
         solve();
       }
-
 
       //setForces3();
       UINT counter;

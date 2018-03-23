@@ -17,9 +17,9 @@ This is a new release, so there are no reverse dependencies.
 
 ## Resubmission
 
-This is a resubmission. In this version I have:
+This is a resubmission with a patch. In this version I have:
 
 * Changed the version number. 
   
-* Added author-year citation before DOI.
+* Fixed a problem with the persistence of public variables. Repeated execution of toVenn led to slower convergence. Thanks to Frank Ruge for pointing this out.
 
