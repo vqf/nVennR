@@ -1897,56 +1897,84 @@ class borderLine
       return bl;
     }
 
-    /*void setCoords(string dataFile){
-      ifstream vFile;
-      vFile.open(dataFile.c_str());
+    std::vector<std::string> split_string(const std::string& str,
+                                          const std::string& delimiter)
+    {
+      std::vector<std::string> strings;
+
+      std::string::size_type pos = 0;
+      std::string::size_type prev = 0;
+      while ((pos = str.find(delimiter, prev)) != std::string::npos)
+      {
+        strings.push_back(str.substr(prev, pos - prev));
+        prev = pos + delimiter.size();
+      }
+
+      // To get the last substring (or only, if delimiter is not found)
+      strings.push_back(str.substr(prev));
+
+      return strings;
+    }
+
+    void setCoords(string dataFile){
       UINT ncI = 0;
-      if (vFile.good() == true){
-        bl.clear();
-        bl_old5.clear();
-        bl_old10.clear();
-        string line;
-        getline(vFile, line); // _F
-        getline(vFile, line); // ncyclesInterrupted or _L
-        if (line != "_L"){
-          int c = atoi(line.c_str());
-          if (c > 0) ncI = (UINT) c;
-          blSettings.ncyclesInterrupted = ncI;
-          getline(vFile, line); // _L
+      UINT i = 0;
+      vector<string> l = split_string(dataFile, "\n");
+      bl.clear();
+      bl_old5.clear();
+      bl_old10.clear();
+      string line = l[i];
+      //getline(vFile, line); // _F
+      i++; line = l[i]; // ncyclesInterrupted or _L
+      if (line != "_L"){
+        int c = atoi(line.c_str());
+        if (c > 0) ncI = (UINT) c;
+        blSettings.ncyclesInterrupted = ncI;
+        i++; line = l[i];
+      }
+      bool strend = false;
+      while (line == "_L" && strend == false){
+        vector<point> thisline;
+        //getline(vFile, line); // First x coord
+        i++; line = l[i];
+        while (line != "_L" && line != "_C" && strend == false){
+          float x = atof(line.c_str());
+          //getline(vFile, line);
+          i++; line = l[i];
+          float y = atof(line.c_str());
+          point p; initPoint(&p);
+          p.x = x; p.y = y;
+          setScale(p);
+          thisline.insert(thisline.end(), p);
+          //getline(vFile, line);
+          i++; line = l[i];
         }
-        while (line == "_L" && vFile.eof() == false){
-          vector<point> thisline;
-          getline(vFile, line); // First x coord
-          while (line != "_L" && line != "_C" && vFile.eof() == false){
-            float x = atof(line.c_str());
-            getline(vFile, line);
-            float y = atof(line.c_str());
-            point p; initPoint(&p);
-            p.x = x; p.y = y;
-            setScale(p);
-            thisline.insert(thisline.end(), p);
-            getline(vFile, line);
+        bl.insert(bl.end(), thisline);
+      }
+      if (line == "_C"){
+        //getline(vFile, line);
+        i++; line = l[i];
+        int j = 0;
+        while (strend == false){
+          float x = atof(line.c_str());
+          //getline(vFile, line);
+          i++; line = l[i];
+          float y = atof(line.c_str());
+          //getline(vFile, line);
+          i++; line = l[i];
+          float r = atof(line.c_str());
+          //getline(vFile, line);
+          i++; line = l[i];
+          circles[j].x = x; circles[j].y = y; circles[j].radius = r;
+          if (i >= l.size()){
+            strend = true;
           }
-          bl.insert(bl.end(), thisline);
-        }
-        if (line == "_C"){
-          getline(vFile, line);
-          int i = 0;
-          while (vFile.eof() == false){
-            float x = atof(line.c_str());
-            getline(vFile, line);
-            float y = atof(line.c_str());
-            getline(vFile, line);
-            float r = atof(line.c_str());
-            getline(vFile, line);
-            circles[i].x = x; circles[i].y = y; circles[i].radius = r;
-            i++;
-          }
+          j++;
         }
       }
-    }*/
+    }
 
-    fileText saveFigure(){
+    string saveFigure(){
       fileText result;
       result.addLine("_F");
       string nc = UINT2string(blSettings.ncyclesInterrupted);
@@ -1970,7 +1998,7 @@ class borderLine
         result.addLine(y);
         result.addLine(r);
       }
-      return result;
+      return result.getText();
     }
 
 
@@ -2493,12 +2521,12 @@ class borderLine
     }
   };
 
-
 void fcall(StringVector x){
   Environment env("package:nVennR");
   Function f = env["showSVG"];
   f(x);
 }
+
 
 // This is a simple example of exporting a C++ function to R. You can
 // source this function into an R session using the Rcpp::sourceCpp
@@ -2549,4 +2577,37 @@ StringVector drawVenn(StringVector x) {
   string html = lines.toSVG();
   result.push_back(html);
   return result;
+}
+
+
+// [[Rcpp::export]]
+List makeVenn(List x) {
+  std::vector<std::string> groupNames;
+  std::vector<float> weights;
+  borderLine *line = new borderLine();
+  StringVector result = as<StringVector>(x["def"]);
+  List toret = List::create(Named("def") = result);
+  int number = atoi(result[1]);
+  int n = twoPow(number);
+  int i;
+  for (i = 0; i < number; i++){
+    groupNames.push_back((string) result[i+2]);
+  }
+  for (i = 0; i < n; i++){
+    int j = i + 2 + number;
+    weights.push_back(atoi(result[j]));
+  }
+  binMap mymap(number);
+  line = new borderLine(&mymap, groupNames, weights);
+  string points;
+  if (x.containsElementNamed("set")){  // Previous run
+    points = Rcpp::as<std::string>(x["set"]);
+    line->setCoords(points);
+  }
+  line->simulate();
+  string html = line->saveFigure();
+  toret["set"] = html;
+  line->refine();
+  toret["svg"] = line->toSVG();
+  return toret;
 }

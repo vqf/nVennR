@@ -23,3 +23,4 @@ This is a resubmission with a patch. In this version I have:
   
 * Fixed a problem with the persistence of public variables. Repeated execution of toVenn led to slower convergence. Thanks to Frank Ruge for pointing this out.
 
+* I apologize about this untimely update. It covers a bug I thought I had fixed, but there was a case I had not foreseen. Hopefully, no more updates will be needed in the following months.

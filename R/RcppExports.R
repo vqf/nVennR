@@ -5,3 +5,7 @@ drawVenn <- function(x) {
     .Call('_nVennR_drawVenn', PACKAGE = 'nVennR', x)
 }
 
+makeVenn <- function(x) {
+    .Call('_nVennR_makeVenn', PACKAGE = 'nVennR', x)
+}
+
