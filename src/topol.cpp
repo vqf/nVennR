@@ -2495,10 +2495,10 @@ class borderLine
 
 
 
-    void simulate(int maxRel = 0)
+    void simulate(UINT nCycles = 7e3, int maxRel = 0)
     {
       UINT i;
-      UINT it1 = (UINT) 7e3;
+      UINT it1 = nCycles;
       point minP;
       initPoint(&minP);
       point maxP;
@@ -2615,14 +2615,14 @@ borderLine* readVennInfo(List x){
 
 
 // [[Rcpp::export]]
-List makeVenn(List x){
+List makeVenn(List x, int nCycl){
   List toret = List::create(Named("def") = x["def"]);
   borderLine* line = readVennInfo(x);
   if (x.containsElementNamed("set")){  // Previous run
     string points = Rcpp::as<std::string>(x["set"]);
     line->setCoords(points);
   }
-  line->simulate();
+  line->simulate((UINT) nCycl);
   toret["set"] = line->saveFigure();
   return toret;
 }

@@ -4,14 +4,23 @@
 \alias{plotVenn}
 \title{Create Venn diagram using the nVenn algorithm.}
 \usage{
-plotVenn(..., sNames = NULL)
+plotVenn(..., nVennObj = NULL, nCycles = 7000, sNames = NULL,
+  showPlot = T, showInViewer = F)
 }
 \arguments{
-\item{...}{One list or vector (possibly mixed) per set. If the input
-is a list with a name, that name will be used for the legend. If not, names can be
+\item{...}{One list or vector (possibly mixed) per set. The function also accepts tables and data frames.
+If input lists have names, those names will be used for the legend. If not, names can be
 provided with \code{sNames}.}
 
-\item{sNames}{List of set names, in the same order as the input lists.}
+\item{nVennObj}{Object returned from previous run. If provided, the function will improve the
+diagram by running more cycles on the previous result.}
+
+\item{nCycles}{Number of cycles for the simulation. For up to 4 sets, the default number of 7000
+should be enough. Even for more complex scenarios, it may be better to run the function repeatedly,
+as a large number of cycles may take up too many resources.}
+
+\item{sNames}{List of set names, in the same order as the input lists. If the input has tables or
+data frames and the name exists, it will select the corresponding column.}
 }
 \value{
 nVennObj with the result of the simulation. As a side effect, The result is drawn in the

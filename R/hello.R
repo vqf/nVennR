@@ -187,7 +187,7 @@ plotVenn <- function(..., nVennObj=NULL, nCycles=7000, sNames=NULL,
   else{
     lresult <- nVennObj
   }
-  myVenn <- makeVenn(lresult)
+  myVenn <- makeVenn(lresult, nCycles)
   class(myVenn) <- append(class(myVenn), "nVennObj")
   if (showPlot == T) showSVG(myVenn)
   return(myVenn)

@@ -17,13 +17,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // makeVenn
-List makeVenn(List x);
-RcppExport SEXP _nVennR_makeVenn(SEXP xSEXP) {
+List makeVenn(List x, int nCycl);
+RcppExport SEXP _nVennR_makeVenn(SEXP xSEXP, SEXP nCyclSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(makeVenn(x));
+    Rcpp::traits::input_parameter< int >::type nCycl(nCyclSEXP);
+    rcpp_result_gen = Rcpp::wrap(makeVenn(x, nCycl));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -41,7 +42,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_nVennR_drawVenn", (DL_FUNC) &_nVennR_drawVenn, 1},
-    {"_nVennR_makeVenn", (DL_FUNC) &_nVennR_makeVenn, 1},
+    {"_nVennR_makeVenn", (DL_FUNC) &_nVennR_makeVenn, 2},
     {"_nVennR_refineVenn", (DL_FUNC) &_nVennR_refineVenn, 1},
     {NULL, NULL, 0}
 };
