@@ -14,7 +14,7 @@ showSVG(mySVG, opacity = 0.4, outFile = "", systemShow = FALSE)
 \item{outFile}{File name to save SVG figure. If empty, a temp file will be created and
 shown in the viewer, if possible.}
 
-\item{systemShow}{Show the result in the system SVG viewer.}
+\item{systemShow}{Show the result in the system SVG viewer (i. e., Inkscape).}
 }
 \value{
 Nothing. Creates a Venn diagram in svg as a side effect.

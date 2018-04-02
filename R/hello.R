@@ -1,5 +1,3 @@
-library(R6)
-
 # Hello, world!
 #
 # This is an example function named 'hello'
@@ -20,69 +18,6 @@ library(R6)
 NULL
 
 
-#' Create Venn diagram using the nVenn algorithm.
-#'
-#' This algorithm is based on a simulation
-#' that compacts the figure. To avoid clogging the system, the simulation stops every 7000
-#' cycles and asks the user if it sould go on. Only answering 'y' continues. Once the
-#' diagram is compact, it will be slightly embellished. By default, the resulting figure
-#' is show at the viewer, but users can also capture the return value and call showVenn
-#' with other parameters.
-#'
-#' @param draw Show Venn diagram in the viewer as a side effect. Defaults to true.
-#' @param sNames List of set names, in the same order as the input lists.
-#' @param ... One list or vector (possibly mixed) per set. If the input
-#' is a list with a name, that name will be used for the legend.
-#' @return SVG code for the Venn diagram.
-#' @examples
-#' set1 <- c('a', 'b', 'c')
-#' set2 <- c('e', 'f', 'c')
-#' set3 <- c('c', 'b', 'e')
-#' mySVG <- toVenn(set1, set2, set3, sNames=c("One", "Two", "Three"))
-#' showSVG(mySVG=mySVG, opacity=0.2)
-#' @export
-toVenn <- function(..., sNames=NULL, draw=TRUE){
-  sets <- list(...)
-  nBits <- length(sets)
-  nNames <- length(sNames)
-  nRegions <- bitwShiftL(1, nBits)
-  result <- c("nVenn1.2", toString(nBits))
-  for (i in 1:nBits){
-    cname <- paste('name', i, sep='')
-    if (nNames >= i && sNames[[i]] != ""){
-      cname = sNames[[i]]
-    }
-    if (length(names(sets[[i]])) > 0){
-      cname <- names(sets[[i]])
-    }
-    result <- c(result, cname)
-  }
-  al <- unlist(sets[[1]])
-  for (i in 2:nBits){
-    al <- union(al, unlist(sets[[i]]))
-  }
-  result <- c(result, toString(0))
-  for (i in 1:(nRegions - 1)){
-    start <- al
-    belongs <- .toBin(i, nBits)
-    for (j in 1:length(belongs)){
-      k <- belongs[[j]]
-      if (k == 1){
-        start <- intersect(start, unlist(sets[[j]]))
-      }
-      else{
-        start <- setdiff(start, unlist(sets[[j]]))
-      }
-    }
-    result <- c(result, length(start))
-  }
-  cat(result, sep="\n")
-  mySVG <- makeVenn(result)
-  if (draw) showSVG(mySVG)
-  return(mySVG)
-}
-
-
 
 #' Show Venn diagram. Automatically called from toVenn.
 #'
@@ -90,7 +25,7 @@ toVenn <- function(..., sNames=NULL, draw=TRUE){
 #' @param opacity Fill opacity for the sets. Defaults to 0.4.
 #' @param outFile File name to save SVG figure. If empty, a temp file will be created and
 #' shown in the viewer, if possible.
-#' @param systemShow Show the result in the system SVG viewer.
+#' @param systemShow Show the result in the system SVG viewer (i. e., Inkscape).
 #' @return Nothing. Creates a Venn diagram in svg as a side effect.
 #' @export
 showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
@@ -128,6 +63,7 @@ showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
 #' @param nCycles Number of cycles for the simulation. For up to 4 sets, the default number of 7000
 #' should be enough. Even for more complex scenarios, it may be better to run the function repeatedly,
 #' as a large number of cycles may take up too many resources.
+#' @param showPlot Show the result in the graphic device.
 #' @param ... One list or vector (possibly mixed) per set. The function also accepts tables and data frames.
 #' If input lists have names, those names will be used for the legend. If not, names can be
 #' provided with \code{sNames}.
@@ -141,7 +77,7 @@ showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
 #' showSVG(mySVG=mySVG, opacity=0.2)
 #' @export
 plotVenn <- function(..., nVennObj=NULL, nCycles=7000, sNames=NULL,
-                     showPlot=T, showInViewer=F){
+                     showPlot=T){
   sets <- list(...)
   nBits <- length(sets)
   lresult <- NULL

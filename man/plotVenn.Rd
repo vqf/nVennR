@@ -5,7 +5,7 @@
 \title{Create Venn diagram using the nVenn algorithm.}
 \usage{
 plotVenn(..., nVennObj = NULL, nCycles = 7000, sNames = NULL,
-  showPlot = T, showInViewer = F)
+  showPlot = T)
 }
 \arguments{
 \item{...}{One list or vector (possibly mixed) per set. The function also accepts tables and data frames.
@@ -21,6 +21,8 @@ as a large number of cycles may take up too many resources.}
 
 \item{sNames}{List of set names, in the same order as the input lists. If the input has tables or
 data frames and the name exists, it will select the corresponding column.}
+
+\item{showPlot}{Show the result in the graphic device.}
 }
 \value{
 nVennObj with the result of the simulation. As a side effect, The result is drawn in the
