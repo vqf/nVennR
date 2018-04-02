@@ -737,6 +737,7 @@ class borderLine
     warn.insert(warn.end(), temp);
   }
 
+
   string float2string(float f){
     char* dsp = (char*) calloc(100, sizeof(char));
     if (dsp){
@@ -1897,6 +1898,14 @@ class borderLine
       return bl;
     }
 
+    void quack(){
+      UINT i = 0;
+      Rprintf("%d groups:\n", bl.size());
+      for (i = 0; i < bl.size(); i++){
+        Rprintf("\tGroup %d: %d points\n", i, bl[i].size());
+      }
+    }
+
     std::vector<std::string> split_string(const std::string& str,
                                           const std::string& delimiter)
     {
@@ -1949,6 +1958,7 @@ class borderLine
           //getline(vFile, line);
           i++; line = l[i];
         }
+        //if (i >= nLines || line == "_C") strend = true;
         bl.insert(bl.end(), thisline);
       }
       if (line == "_C"){
@@ -1966,12 +1976,14 @@ class borderLine
           //getline(vFile, line);
           i++; line = l[i];
           circles[j].x = x; circles[j].y = y; circles[j].radius = r;
-          if (i >= l.size()){
+          if (i >= (l.size() - 1)){
             strend = true;
           }
           j++;
         }
       }
+      initOlds();
+      //Rprintf("Written coords for %d lines\n", bl.size());
     }
 
     string saveFigure(){
@@ -1980,6 +1992,7 @@ class borderLine
       string nc = UINT2string(blSettings.ncyclesInterrupted);
       result.addLine(nc);
       UINT i; UINT j;
+      //Rprintf("blSize: %d\n", bl.size());
       for (i = 0; i < bl.size(); i++){
         result.addLine("_L");
         for (j = 0; j < bl[i].size(); j++){
@@ -2491,14 +2504,12 @@ class borderLine
       point maxP;
       initPoint(&maxP);
       udt.init(rdt);
-      Rprintf("Starting...\n");
-
+      //Rprintf("Starting...\n");
 
       for (i = 0; i < it1; i++){
         setForces1();
         solve();
       }
-
       //setForces3();
       UINT counter;
       for (counter = 0; counter < dataDisplay.size(); counter++){
@@ -2509,7 +2520,9 @@ class borderLine
     void refine(){
       UINT i;
       UINT it2 = (UINT) 2e2;
-      Rprintf("Refining...\n");
+      //Rprintf("Refining...\n");
+      blSettings.lrdt = rdt / 10;
+      setAsStable();
       UINT np = (UINT) (1.5f * (float) startPerim);
       interpolate(np);
       blSettings.margin /= 10;
@@ -2580,13 +2593,11 @@ StringVector drawVenn(StringVector x) {
 }
 
 
-// [[Rcpp::export]]
-List makeVenn(List x) {
+borderLine* readVennInfo(List x){
   std::vector<std::string> groupNames;
   std::vector<float> weights;
   borderLine *line = new borderLine();
   StringVector result = as<StringVector>(x["def"]);
-  List toret = List::create(Named("def") = result);
   int number = atoi(result[1]);
   int n = twoPow(number);
   int i;
@@ -2599,15 +2610,31 @@ List makeVenn(List x) {
   }
   binMap mymap(number);
   line = new borderLine(&mymap, groupNames, weights);
-  string points;
+  return line;
+}
+
+
+// [[Rcpp::export]]
+List makeVenn(List x){
+  List toret = List::create(Named("def") = x["def"]);
+  borderLine* line = readVennInfo(x);
   if (x.containsElementNamed("set")){  // Previous run
-    points = Rcpp::as<std::string>(x["set"]);
+    string points = Rcpp::as<std::string>(x["set"]);
     line->setCoords(points);
   }
   line->simulate();
-  string html = line->saveFigure();
-  toret["set"] = html;
-  line->refine();
-  toret["svg"] = line->toSVG();
+  toret["set"] = line->saveFigure();
   return toret;
+}
+
+// [[Rcpp::export]]
+StringVector refineVenn(List x){
+  borderLine* line = readVennInfo(x);
+  if (x.containsElementNamed("set")){  // Previous run
+    string points = Rcpp::as<std::string>(x["set"]);
+    line->setCoords(points);
+  }
+  line->refine();
+  StringVector result = (line->toSVG());
+  return result;
 }

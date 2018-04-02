@@ -1,4 +1,5 @@
 library(R6)
+
 # Hello, world!
 #
 # This is an example function named 'hello'
@@ -96,6 +97,7 @@ showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
   tfile = outFile
   if (tfile == "") tfile <- tempfile(fileext = ".svg")
   tfile2 <- tempfile(fileext = ".svg")
+  mySVG$svg <- refineVenn(mySVG)
   # transform SVG
   mySVG$svg <- sub("fill-opacity: *([^ ;]+) *;", paste("fill-opacity: ", opacity, ";"), mySVG$svg)
   ###############
@@ -119,58 +121,75 @@ showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
 #' diagram is compact, it will be slightly embellished. This function is different in use and
 #' output from toVenn, which will probably deprecated.plotVenn
 #'
-#' @param sNames List of set names, in the same order as the input lists.
-#' @param ... One list or vector (possibly mixed) per set. If the input
-#' is a list with a name, that name will be used for the legend. If not, names can be
+#' @param sNames List of set names, in the same order as the input lists. If the input has tables or
+#' data frames and the name exists, it will select the corresponding column.
+#' @param nVennObj Object returned from previous run. If provided, the function will improve the
+#' diagram by running more cycles on the previous result.
+#' @param nCycles Number of cycles for the simulation. For up to 4 sets, the default number of 7000
+#' should be enough. Even for more complex scenarios, it may be better to run the function repeatedly,
+#' as a large number of cycles may take up too many resources.
+#' @param ... One list or vector (possibly mixed) per set. The function also accepts tables and data frames.
+#' If input lists have names, those names will be used for the legend. If not, names can be
 #' provided with \code{sNames}.
-#' @return SVG code for the Venn diagram. As a side effect, The result is drawn in the
+#' @return nVennObj with the result of the simulation. As a side effect, The result is drawn in the
 #' plot window.
 #' @examples
-#' set1 <- c('a', 'b', 'c')
-#' set2 <- c('e', 'f', 'c')
-#' set3 <- c('c', 'b', 'e')
+#' set1 <- list(set1 = c('a', 'b', 'c'))
+#' set2 <- list(set2 = c('e', 'f', 'c'))
+#' set3 <- list(set3 = c('c', 'b', 'e'))
 #' mySVG <- plotVenn(set1, set2, set3, sNames=c("One", "Two", "Three"))
 #' showSVG(mySVG=mySVG, opacity=0.2)
 #' @export
-plotVenn <- function(..., sNames=NULL){
+plotVenn <- function(..., nVennObj=NULL, nCycles=7000, sNames=NULL,
+                     showPlot=T, showInViewer=F){
   sets <- list(...)
   nBits <- length(sets)
-  nNames <- 0
-  if (!missing(sNames)) nNames <- length(sNames)
-  nRegions <- bitwShiftL(1, nBits)
-  result <- c("nVenn1.2", toString(nBits))
-  for (i in 1:nBits){
-    cname <- paste('name', i, sep='')
-    if (nNames >= i && sNames[[i]] != ""){
-      cname = sNames[[i]]
+  lresult <- NULL
+  if (is.null(nVennObj)){
+    if (nBits == 0){
+      stop("You must provide at least one list (and seriously consider providing more than one)")
     }
-    if (length(names(sets[[i]])) > 0){
-      cname <- names(sets[[i]])
-    }
-    result <- c(result, cname)
-  }
-  al <- unlist(sets[[1]])
-  for (i in 2:nBits){
-    al <- union(al, unlist(sets[[i]]))
-  }
-  result <- c(result, toString(0))
-  for (i in 1:(nRegions - 1)){
-    start <- al
-    belongs <- .toBin(i, nBits)
-    for (j in 1:length(belongs)){
-      k <- belongs[[j]]
-      if (k == 1){
-        start <- intersect(start, unlist(sets[[j]]))
+    nNames <- 0
+    if (!missing(sNames)) nNames <- length(sNames)
+    nRegions <- bitwShiftL(1, nBits)
+    result <- c("nVenn1.2", toString(nBits))
+    for (i in 1:nBits){
+      cname <- paste('name', i, sep='')
+      if (nNames >= i && sNames[[i]] != ""){
+        cname = sNames[[i]]
       }
-      else{
-        start <- setdiff(start, unlist(sets[[j]]))
+      if (length(names(sets[[i]])) > 0){
+        cname <- names(sets[[i]])
       }
+      result <- c(result, cname)
     }
-    result <- c(result, length(start))
+    al <- unlist(sets[[1]])
+    for (i in 2:nBits){
+      al <- union(al, unlist(sets[[i]]))
+    }
+    result <- c(result, toString(0))
+    for (i in 1:(nRegions - 1)){
+      start <- al
+      belongs <- .toBin(i, nBits)
+      for (j in 1:length(belongs)){
+        k <- belongs[[j]]
+        if (k == 1){
+          start <- intersect(start, unlist(sets[[j]]))
+        }
+        else{
+          start <- setdiff(start, unlist(sets[[j]]))
+        }
+      }
+      result <- c(result, length(start))
+    }
+    lresult <- list(def=result)
   }
-  lresult <- list(def=result)
+  else{
+    lresult <- nVennObj
+  }
   myVenn <- makeVenn(lresult)
-  showSVG(myVenn)
+  class(myVenn) <- append(class(myVenn), "nVennObj")
+  if (showPlot == T) showSVG(myVenn)
   return(myVenn)
 }
 

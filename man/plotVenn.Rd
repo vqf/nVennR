@@ -4,7 +4,7 @@
 \alias{plotVenn}
 \title{Create Venn diagram using the nVenn algorithm.}
 \usage{
-plotVenn(..., sNames = c())
+plotVenn(..., sNames = NULL)
 }
 \arguments{
 \item{...}{One list or vector (possibly mixed) per set. If the input
@@ -14,7 +14,7 @@ provided with \code{sNames}.}
 \item{sNames}{List of set names, in the same order as the input lists.}
 }
 \value{
-SVG code for the Venn diagram. As a side effect, The result is drawn in the
+nVennObj with the result of the simulation. As a side effect, The result is drawn in the
 plot window.
 }
 \description{
@@ -25,9 +25,9 @@ diagram is compact, it will be slightly embellished. This function is different 
 output from toVenn, which will probably deprecated.plotVenn
 }
 \examples{
-set1 <- c('a', 'b', 'c')
-set2 <- c('e', 'f', 'c')
-set3 <- c('c', 'b', 'e')
+set1 <- list(set1 = c('a', 'b', 'c'))
+set2 <- list(set2 = c('e', 'f', 'c'))
+set3 <- list(set3 = c('c', 'b', 'e'))
 mySVG <- plotVenn(set1, set2, set3, sNames=c("One", "Two", "Three"))
 showSVG(mySVG=mySVG, opacity=0.2)
 }

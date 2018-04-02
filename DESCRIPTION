@@ -19,3 +19,4 @@ LinkingTo: Rcpp
 Imports: Rcpp,
     grImport2,
     rsvg
+Suggests: testthat

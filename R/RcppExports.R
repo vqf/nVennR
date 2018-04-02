@@ -9,3 +9,7 @@ makeVenn <- function(x) {
     .Call('_nVennR_makeVenn', PACKAGE = 'nVennR', x)
 }
 
+refineVenn <- function(x) {
+    .Call('_nVennR_refineVenn', PACKAGE = 'nVennR', x)
+}
+

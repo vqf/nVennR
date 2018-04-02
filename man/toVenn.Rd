@@ -4,7 +4,7 @@
 \alias{toVenn}
 \title{Create Venn diagram using the nVenn algorithm.}
 \usage{
-toVenn(..., sNames, draw = TRUE)
+toVenn(..., sNames = NULL, draw = TRUE)
 }
 \arguments{
 \item{...}{One list or vector (possibly mixed) per set. If the input
