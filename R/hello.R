@@ -70,7 +70,7 @@ showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE, showProgre
 #' If input lists have names, those names will be used for the legend. If not, names can be
 #' provided with \code{sNames}.
 #' @return nVennObj with the result of the simulation. As a side effect, The result is drawn in the
-#' plot window.
+#' graphical device.
 #' @examples
 #' set1 <- list(set1 = c('a', 'b', 'c'))
 #' set2 <- list(set2 = c('e', 'f', 'c'))
@@ -80,47 +80,14 @@ showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE, showProgre
 #' @export
 plotVenn <- function(..., nVennObj=NULL, nCycles=7000, sNames=NULL,
                      showPlot=T, showProgress=F){
-  sets <- list(...)
-  nBits <- length(sets)
   lresult <- NULL
   if (is.null(nVennObj)){
+    sets <- .flattenInput(..., sNames=sNames)
+    nBits <- .getNBits(sets)
     if (nBits == 0){
       stop("You must provide at least one list (and seriously consider providing more than one)")
     }
-    nNames <- 0
-    if (!missing(sNames)) nNames <- length(sNames)
-    nRegions <- bitwShiftL(1, nBits)
-    result <- c("nVenn1.2", toString(nBits))
-    for (i in 1:nBits){
-      cname <- paste('name', i, sep='')
-      if (nNames >= i && sNames[[i]] != ""){
-        cname = sNames[[i]]
-      }
-      if (length(names(sets[[i]])) > 0){
-        cname <- names(sets[[i]])
-      }
-      result <- c(result, cname)
-    }
-    al <- unlist(sets[[1]])
-    for (i in 2:nBits){
-      al <- union(al, unlist(sets[[i]]))
-    }
-    result <- c(result, toString(0))
-    for (i in 1:(nRegions - 1)){
-      start <- al
-      belongs <- .toBin(i, nBits)
-      for (j in 1:length(belongs)){
-        k <- belongs[[j]]
-        if (k == 1){
-          start <- intersect(start, unlist(sets[[j]]))
-        }
-        else{
-          start <- setdiff(start, unlist(sets[[j]]))
-        }
-      }
-      result <- c(result, length(start))
-    }
-    lresult <- list(def=result)
+    lresult <- .processVenn(sets, nBits)
   }
   else{
     lresult <- nVennObj
@@ -132,8 +99,79 @@ plotVenn <- function(..., nVennObj=NULL, nCycles=7000, sNames=NULL,
 }
 
 
+.getNBits <- function(sets){
+  return(length(sets))
+}
 
+.flattenInput <- function(..., sNames=NULL){
+  sets <- list(...)
+  result <- list()
+  nNames <- length(sNames)
+  i <- 1
+  for (set in sets){
+    if (class(set) == "table" || class(set) == "matrix" || class(set) == "data.frame"){
+      nSet <- list()
+      mtx <- FALSE
+      if (class(set) == "matrix"){
+        mtx <- TRUE
+      }
+      for (n in colnames(set)){
+        l <- levels(set[,n])
+        if (mtx){ l <- set[,n] }
+        nSet[[n]] <- list(unlist(l))
+      }
+      result <- c(result, nSet)
+    }
+    else{
+      i <- 1
+      iNames <- names(set)
+      niNames <- length(iNames)
+      for (subset in set){
+        cname <- paste('name', i, sep='')
+        if (nNames >= i && sNames[[i]] != ""){
+          cname <- sNames[[i]]
+        }
+        if (niNames >= i && iNames[[i]] != ""){
+          cname <- iNames[[i]]
+        }
+        result[[cname]] <- subset
+        i <- i + 1
+      }
+    }
+  }
+  return(result)
+}
 
+.processVenn <- function(sets, nBits){
+  nRegions <- bitwShiftL(1, nBits)
+  regions <- list()
+  result <- c("nVenn1.2", toString(nBits))
+  al <- unlist(sets[[1]])
+  for (i in 2:nBits){
+    al <- union(al, unlist(sets[[i]]))
+  }
+  result <- c(result, names(sets))
+  result <- c(result, toString(0))
+  for (i in 1:(nRegions - 1)){
+    start <- al
+    belongs <- .toBin(i, nBits)
+    for (j in 1:length(belongs)){
+      k <- belongs[[j]]
+      if (k == 1){
+        start <- intersect(start, unlist(sets[[j]]))
+      }
+      else{
+        start <- setdiff(start, unlist(sets[[j]]))
+      }
+    }
+    regions[[i]] <- start
+    result <- c(result, length(start))
+  }
+  lresult <- list()
+  lresult$def <- result
+  lresult$reg <- regions
+  return(lresult)
+}
 
 .toBin <- function(n, Nbits){
   result <- c()

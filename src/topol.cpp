@@ -2632,6 +2632,7 @@ List makeVenn(List x, int nCycl, bool showProgress){
   }
   line->simulate((UINT) nCycl, showProgress);
   toret["set"] = line->saveFigure();
+  toret["reg"] = x["reg"];
   return toret;
 }
 
