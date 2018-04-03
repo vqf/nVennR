@@ -2,7 +2,8 @@
 #include <vector>
 #include <cmath>
 #include <time.h>
-
+// [[Rcpp::depends(RcppProgress)]]
+#include <progress.hpp>
 
 
 #define CIRCLE_MASS 200.0f
@@ -2495,7 +2496,7 @@ class borderLine
 
 
 
-    void simulate(UINT nCycles = 7e3, int maxRel = 0)
+    void simulate(UINT nCycles = 7e3, bool showProgress = false, int maxRel = 0)
     {
       UINT i;
       UINT it1 = nCycles;
@@ -2504,11 +2505,16 @@ class borderLine
       point maxP;
       initPoint(&maxP);
       udt.init(rdt);
-      //Rprintf("Starting...\n");
-
+      Progress p(it1, showProgress); // we need an instance, should be improved in next version
+      if (showProgress == true){
+        Rprintf("Starting...\n");
+      }
       for (i = 0; i < it1; i++){
         setForces1();
         solve();
+        if (Progress::check_abort() ) return;
+        if (showProgress == true) p.increment();
+
       }
       //setForces3();
       UINT counter;
@@ -2517,27 +2523,29 @@ class borderLine
       }
       dataDisplay.clear();
     }
-    void refine(){
+    void refine(bool showProgress = false){
       UINT i;
       UINT it2 = (UINT) 2e2;
-      //Rprintf("Refining...\n");
+      if (showProgress == true) Rprintf("Refining...\n");
       blSettings.lrdt = rdt / 10;
       setAsStable();
       UINT np = (UINT) (1.5f * (float) startPerim);
       interpolate(np);
       blSettings.margin /= 10;
       setRadii();
+      Progress p(it2, showProgress);
       for (i = 0; i < it2; i++){
         setForces2();
         solve(true);
+        if (showProgress == true) p.increment();
       }
     }
   };
 
-void fcall(StringVector x){
+void fcall_progress(int x, int xmax){
   Environment env("package:nVennR");
-  Function f = env["showSVG"];
-  f(x);
+  Function f = env["svMisc::progress"];
+  f(x, xmax);
 }
 
 
@@ -2577,7 +2585,7 @@ StringVector drawVenn(StringVector x) {
     StringVector tr;
     string thtml = lines.toSVG();
     tr.push_back(thtml);
-    fcall(tr);
+    //fcall(tr);
     goon = false;
     string yo = Rcpp::as<std::string>(as_char(readline("> More cycles? (y/n) ")));
     if (yo == "y"){
@@ -2615,26 +2623,26 @@ borderLine* readVennInfo(List x){
 
 
 // [[Rcpp::export]]
-List makeVenn(List x, int nCycl){
+List makeVenn(List x, int nCycl, bool showProgress){
   List toret = List::create(Named("def") = x["def"]);
   borderLine* line = readVennInfo(x);
   if (x.containsElementNamed("set")){  // Previous run
     string points = Rcpp::as<std::string>(x["set"]);
     line->setCoords(points);
   }
-  line->simulate((UINT) nCycl);
+  line->simulate((UINT) nCycl, showProgress);
   toret["set"] = line->saveFigure();
   return toret;
 }
 
 // [[Rcpp::export]]
-StringVector refineVenn(List x){
+StringVector refineVenn(List x, bool showProgress = false){
   borderLine* line = readVennInfo(x);
   if (x.containsElementNamed("set")){  // Previous run
     string points = Rcpp::as<std::string>(x["set"]);
     line->setCoords(points);
   }
-  line->refine();
+  line->refine(showProgress);
   StringVector result = (line->toSVG());
   return result;
 }

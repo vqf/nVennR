@@ -5,11 +5,11 @@ drawVenn <- function(x) {
     .Call('_nVennR_drawVenn', PACKAGE = 'nVennR', x)
 }
 
-makeVenn <- function(x, nCycl) {
-    .Call('_nVennR_makeVenn', PACKAGE = 'nVennR', x, nCycl)
+makeVenn <- function(x, nCycl, showProgress) {
+    .Call('_nVennR_makeVenn', PACKAGE = 'nVennR', x, nCycl, showProgress)
 }
 
-refineVenn <- function(x) {
-    .Call('_nVennR_refineVenn', PACKAGE = 'nVennR', x)
+refineVenn <- function(x, showProgress = FALSE) {
+    .Call('_nVennR_refineVenn', PACKAGE = 'nVennR', x, showProgress)
 }
 

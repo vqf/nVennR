@@ -26,13 +26,14 @@ NULL
 #' @param outFile File name to save SVG figure. If empty, a temp file will be created and
 #' shown in the viewer, if possible.
 #' @param systemShow Show the result in the system SVG viewer (i. e., Inkscape).
+#' @param showProgress Show progress bar during computation.
 #' @return Nothing. Creates a Venn diagram in svg as a side effect.
 #' @export
-showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
+showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE, showProgress=FALSE){
   tfile = outFile
   if (tfile == "") tfile <- tempfile(fileext = ".svg")
   tfile2 <- tempfile(fileext = ".svg")
-  mySVG$svg <- refineVenn(mySVG)
+  mySVG$svg <- refineVenn(mySVG, showProgress)
   # transform SVG
   mySVG$svg <- sub("fill-opacity: *([^ ;]+) *;", paste("fill-opacity: ", opacity, ";"), mySVG$svg)
   ###############
@@ -64,6 +65,7 @@ showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
 #' should be enough. Even for more complex scenarios, it may be better to run the function repeatedly,
 #' as a large number of cycles may take up too many resources.
 #' @param showPlot Show the result in the graphic device.
+#' @param showProgress Show progress bar during computation.
 #' @param ... One list or vector (possibly mixed) per set. The function also accepts tables and data frames.
 #' If input lists have names, those names will be used for the legend. If not, names can be
 #' provided with \code{sNames}.
@@ -77,7 +79,7 @@ showSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
 #' showSVG(mySVG=mySVG, opacity=0.2)
 #' @export
 plotVenn <- function(..., nVennObj=NULL, nCycles=7000, sNames=NULL,
-                     showPlot=T){
+                     showPlot=T, showProgress=F){
   sets <- list(...)
   nBits <- length(sets)
   lresult <- NULL
@@ -123,9 +125,9 @@ plotVenn <- function(..., nVennObj=NULL, nCycles=7000, sNames=NULL,
   else{
     lresult <- nVennObj
   }
-  myVenn <- makeVenn(lresult, nCycles)
+  myVenn <- makeVenn(lresult, nCycles, showProgress)
   class(myVenn) <- append(class(myVenn), "nVennObj")
-  if (showPlot == T) showSVG(myVenn)
+  if (showPlot == T) showSVG(myVenn, showProgress = showProgress)
   return(myVenn)
 }
 
