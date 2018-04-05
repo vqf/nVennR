@@ -1,0 +1,80 @@
+---
+title: "Using nVennR to generate and explore n-dimensional, quasi-proportional Venn diagrams"
+author: "Victor Quesada"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using nVennR to generate and explore n-dimensional, quasi-proportional Venn diagrams}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+nVennR provides an R interface to the [nVenn algorithm](http://dx.doi.org/10.1093/bioinformatics/bty109). This vignette intends to illustrate three basic uses of nVennR:
+
+* Create Venn and Euler diagrams
+* Generate and customize high-quality figures to depict the diagram
+* Explore the regions of the diagram
+
+## Create diagrams
+There are two ways to create a Venn diagram object (`nVennObj`), which will be referenced as high-level (by providing intersecting lists) and low-level (from scratch).
+
+### High-level
+
+The most common use for a package like nVennR is to depict the relationships between several intersecting lists. The main function for this task is `toVenn`. To achieve flexibility, the default input of this function takes the form of multiple lists. However, lists of lists, tables and data frames can also serve as input. This can lead to tricky scenarios with complex behaviors. As a general rule, avoid this complexity by sticking to one form of input. Examples:
+
+```{r}
+library(nVennR)
+listOne <- list(c('a', 'b', 'c', 'd', 'e'))
+listTwo <- list(c('d', 'e', 'f', 'g', 'h', 'i'))
+listTrhee <- list(c('a', 'b', 'g', 'h', 'e', 'x', 'y', 'z'))
+listFour <- list(c('e', 'a', 'x', 'i', 'r'))
+myV <- toVenn(listOne, listTwo, listTrhee, listFour)
+
+```
+
+### Low-level
+
+## Styles
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))

@@ -19,4 +19,7 @@ LinkingTo: Rcpp, RcppProgress
 Imports: Rcpp, RcppProgress,
     grImport2,
     rsvg
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

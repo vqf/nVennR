@@ -4,17 +4,22 @@
 \alias{showSVG}
 \title{Show Venn diagram. Automatically called from toVenn.}
 \usage{
-showSVG(mySVG, opacity = 0.4, outFile = "", systemShow = FALSE)
+showSVG(nVennObj, opacity = 0.4, borderWidth = 1, outFile = "",
+  systemShow = FALSE, showProgress = FALSE)
 }
 \arguments{
-\item{mySVG}{SVG code defining the diagram. Can be retrieved from toVenn.}
+\item{nVennObj}{Object with nVennR information. Can be obtained from a toVenn call.}
 
 \item{opacity}{Fill opacity for the sets. Defaults to 0.4.}
+
+\item{borderWidth}{Width of set borders. Defaults to 1.}
 
 \item{outFile}{File name to save SVG figure. If empty, a temp file will be created and
 shown in the viewer, if possible.}
 
 \item{systemShow}{Show the result in the system SVG viewer (i. e., Inkscape).}
+
+\item{showProgress}{Show progress bar during computation.}
 }
 \value{
 Nothing. Creates a Venn diagram in svg as a side effect.
