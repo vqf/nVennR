@@ -11,7 +11,13 @@ createVennObj(nSets = 1, sNames = NULL, sSizes = NULL)
 
 \item{sNames}{List of names.}
 
-\item{sSizes}{List of sizes for all the regions (from `0` to `2**nSets - 1`).}
+\item{sSizes}{List of sizes for all the regions (from `0` to `2**nSets - 1`). To understand the order
+of the regions, one can think of a region as a binary number. Each bit tells whether the region belongs
+(1) or not (0) to a given set. For instance, with 4 sets we have 4 bits. The number 7 with 4 bits is
+0111, which describes a region belonging to sets 2, 3, and 4 and not to set 1. To pass the values
+of the regions, those values are sorted according to the number describing the region. Thus, with
+four sets, the first element corresponds to region 0 (0000), the second to region 1 (0001), the third
+to region 2 (0010), ... The last corresponds to region 15 (1111), which belongs to all the sets.}
 }
 \value{
 nVennObj with set information. To plot, it must be sent to `toVenn`. Sending it to `showSVG`

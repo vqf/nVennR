@@ -39,7 +39,7 @@ NULL
 #' @export
 showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemShow=FALSE, showProgress=FALSE,
                     labelRegions=T, showNumbers=T, setColors=NULL, fontScale=1){
-  nSets <- length(nVennObj$orig)
+  nSets <- nVennObj$def[[2]]
   tfile = outFile
   if (tfile == "") tfile <- tempfile(fileext = ".svg")
   tfile2 <- tempfile(fileext = ".svg")
@@ -60,7 +60,8 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemSh
     nVennObj$svg <- sub("(belong *\\{.*?font-size *: *)[^;]+", paste("\\1", cFs, "px", sep = ""), nVennObj$svg)
   }
   if (length(setColors) > 0){
-    for (i in 1:min(length(setColors), nSets)){
+    n <- min(length(setColors), nSets)
+    for (i in 1:n){
       ccol <- setColors[[i]]
       topaste <- paste("(q", i - 1, " *\\{.*?stroke *: *)[^ ;]+ *;", sep = "")
       nVennObj$svg <- sub(topaste, paste("\\1", ccol, ";"), nVennObj$svg)
@@ -126,7 +127,7 @@ toVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
   else{
     lresult <- nVennObj
   }
-  rg <- .getRegions(nVennObj)
+  rg <- .getRegions(lresult)
   if (!(any(rg > 0))){
     message("All regions are zero. The resulting diagram will probably be blank.")
     message("If you still want the diagram, you can set nCycles to zero.")

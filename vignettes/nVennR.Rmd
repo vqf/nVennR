@@ -43,20 +43,59 @@ myV <- toVenn(list(SAS=sas, PYTHON=python, R=rr))
 The number of sets is arbitrary. For more than five sets, the default 7000 simulation cycles may not be enough. You can set a different number of cycles with `nCycles`, or you can run the simulation repeatedly by providing the returned `nVennObj` to `toVenn`.
 
 ```{r, dev='svg', fig.show='hold', fig.keep='all'}
-#myV <- toVenn(list(SAS=sas, PYTHON=python, R=rr, c("A006", "A008", "A011", "Unk"), c("A011", "Unk", "A101", "A006", "A000"), c("A101", "A006", "A008")))
-#myV <- toVenn(nVennObj = myV)
+myV2 <- toVenn(list(SAS=sas, PYTHON=python, R=rr, c("A006", "A008", "A011", "Unk"), c("A011", "Unk", "A101", "A006", "A000"), c("A101", "A006", "A008")))
+myV2 <- toVenn(nVennObj = myV2)
 
 ```
 
 ### Low-level
+Users can also build an nVennObj from scratch. Most of the time, this will not be useful, but it might have some theoretical applications. For instance, let us get a five-set Venn diagram (in Venn diagrams, all the regions are shown). With the high-level procedure, we would need five sets with all the possible intersections. Instead, we can use `createVennObj`:
 
-## Styles
+```{r dev='svg', fig.show='hold', fig.keep='all'}
+myV3 <- createVennObj(nSets = 5, sSizes = c(rep(1, 32)))
+myV3 <- toVenn(nVennObj = myV3)
+myV3 <- toVenn(nVennObj = myV3)
+```
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+Incidentally, these figures show another reason to run `toVenn` repeatedly rather than raising `nCycles`. Each time the function runs, the speed of the simulation is reset, which may make convergence much faster. If we had run `myV3 <- toVenn(nVennObj = myV3, nCyles=14000)`, the resulting figure would have been very similar to the left panel.
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+The `sSizes` vector contains the values of each region of the diagram. From the help,
+
+>To understand the order of the regions, one can think of a region as a binary number. Each bit tells whether the region belongs (1) or not (0) to a given set. For instance, with 4 sets we have 4 bits. The number 7 with 4 bits is 0111, which describes a region belonging to sets 2, 3, and 4 and not to set 1. To pass the values of the regions, those values are sorted according to the number describing the region. Thus, with four sets, the first element corresponds to region 0 (0000), the second to region 1 (0001), the third to region 2 (0010), ... The last corresponds to region 15 (1111), which belongs to all the sets.
+
+You can also read more than you want to know about this procedure [here](https://github.com/vqf/nVenn) and [here](http://degradome.uniovi.es/vqf/SCD.html).
+
+After creating `myV3`, we can manipulate the size of each region separately with the `setVennRegion` function:
+
+```{r dev='svg'}
+myV3 <- setVennRegion(myV3, region = c("Group1", "Group3", "Group4"), value = 4) # region equivalent to c(1, 0, 1, 1, 0)
+myV3 <- setVennRegion(myV3, region = c(0, 1, 0, 0, 1), value = 8) # region equivalent to c("Group2", "Group5")
+myV3 <- toVenn(nVennObj = myV3)
+```
+
+## Manipulate figures
+
+Once an nVennObj has been created, you can generate the corresponding figure with `toVenn`, as shown in previous examples. If you are happy with the layout of the diagram, you do not need to run the simulation again to tweak the figure. This is better achieved with `showSVG`. At its present form, with `showSVG` you can change the colors and opacity of the sets, the width of the set borders and the font sizes of the labels.
+Opacity and border width are easy to understand:
+
+```{r dev='svg', fig.show='hold', fig.keep='all'}
+showSVG(nVennObj = myV3, opacity = 0.1)
+showSVG(nVennObj = myV3, opacity = 0.1, borderWidth = 3)
+```
+
+Set colors are provided as a vector, with one color per set. Colors are expressed in an SVG CSS compatible form. Please, be aware that these expressions are not evaluated. If you provide wrong colors, the SVG rendering will fail.
+
+```{r dev='svg', fig.show='hold', fig.keep='all'}
+showSVG(nVennObj = myV3, setColors = c('#d7100b', '#ff4e02', '#eeed2f', '#067e1d', '#2b55b7'))
+showSVG(nVennObj = myV3, setColors = c('#d7100b', 'teal', 'white', 'black', '#2b55b7'))
+```
+
+There are two types of labels: `size labels` (large numbers) and `region labels` (smaller numbers in parentheses). They can be hidden by setting `showNumbers` and `labelRegions` to false, respectively. The font size for `size labels` is double the font size of `region labels`. In this version on `nVennR`, this ratio is fixed, but the sizes can be manipulated with `fontScale`. The number provided multiplies the default font size of the labels. Numbers larger than 2 are discouraged, as labels can overlap in the figure.
+
+```{r dev='svg', fig.show='hold', fig.keep='all'}
+showSVG(nVennObj = myV3, opacity = 0.1, showNumbers = F, fontScale = 2) # Avoid overlaps by hiding size labels
+showSVG(nVennObj = myV3, opacity = 0.1, labelRegions = F, fontScale = 3) # Avoid overlaps by hiding region labels
+```
 
 ## Figures
 
