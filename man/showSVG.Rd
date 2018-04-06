@@ -5,7 +5,8 @@
 \title{Show Venn diagram. Automatically called from toVenn.}
 \usage{
 showSVG(nVennObj, opacity = 0.4, borderWidth = 1, outFile = "",
-  systemShow = FALSE, showProgress = FALSE)
+  systemShow = FALSE, showProgress = FALSE, labelRegions = T,
+  showNumbers = T, setColors = NULL, fontScale = 1)
 }
 \arguments{
 \item{nVennObj}{Object with nVennR information. Can be obtained from a toVenn call.}
@@ -15,11 +16,22 @@ showSVG(nVennObj, opacity = 0.4, borderWidth = 1, outFile = "",
 \item{borderWidth}{Width of set borders. Defaults to 1.}
 
 \item{outFile}{File name to save SVG figure. If empty, a temp file will be created and
-shown in the viewer, if possible.}
+sent to the graphic device.}
 
 \item{systemShow}{Show the result in the system SVG viewer (i. e., Inkscape).}
 
 \item{showProgress}{Show progress bar during computation.}
+
+\item{labelRegions}{Show region identifiers. These are numbers in parentheses inside each region
+indicating which sets that region belongs to. Defaults to true}
+
+\item{showNumbers}{Show how many elements belong to each region (large numbers in the figure).
+Defaults to true}
+
+\item{setColors}{Vector with the color of each set in order. Color names must be CSS-compatible.}
+
+\item{fontScale}{Multiplier for font sizes. The font size of both numbers and region labels will
+be multiplied by this factor. Values larger than 2 will probably make labels clash.}
 }
 \value{
 Nothing. Creates a Venn diagram in svg as a side effect.

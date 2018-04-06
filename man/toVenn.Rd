@@ -4,13 +4,11 @@
 \alias{toVenn}
 \title{Create Venn diagram using the nVenn algorithm.}
 \usage{
-toVenn(..., nVennObj = NULL, nCycles = 7000, sNames = NULL,
-  showPlot = T, showProgress = F)
+toVenn(sets, nVennObj = NULL, nCycles = 7000, sNames = NULL,
+  showPlot = T, showProgress = F, ...)
 }
 \arguments{
-\item{...}{One list or vector (possibly mixed) per set. The function also accepts tables and data frames.
-If input lists have names, those names will be used for the legend. If not, names can be
-provided with \code{sNames}.}
+\item{sets}{List of lists with the input sets.}
 
 \item{nVennObj}{Object returned from previous run. If provided, the function will improve the
 diagram by running more cycles on the previous result. If nVennObj is provided, do not feed
@@ -26,6 +24,10 @@ data frames and the name exists, it will select the corresponding column.}
 \item{showPlot}{Show the result in the graphic device.}
 
 \item{showProgress}{Show progress bar during computation.}
+
+\item{...}{Options for `showSVG`
+If input lists have names, those names will be used for the legend. If not, names can be
+provided with \code{sNames}.}
 }
 \value{
 nVennObj with the result of the simulation. As a side effect, The result can be drawn in the

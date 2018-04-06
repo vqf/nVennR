@@ -27,15 +27,24 @@ There are two ways to create a Venn diagram object (`nVennObj`), which will be r
 
 ### High-level
 
-The most common use for a package like nVennR is to depict the relationships between several intersecting lists. The main function for this task is `toVenn`. To achieve flexibility, the default input of this function takes the form of multiple lists. However, lists of lists, tables and data frames can also serve as input. This can lead to tricky scenarios with complex behaviors. As a general rule, avoid this complexity by sticking to one form of input. Examples:
+The most common use for a package like nVennR is to depict the relationships between several intersecting lists. The main function for this task is `toVenn`. The input is a list of vectors (or lists) describing each set. The name of each inner vector will be used for labelling. If inner vectors are not named, labels can be provided as a vector with `sNames`. Empty names will be filled with `GroupN`. Examples:
 
-```{r}
+```{r, dev='svg', fig.show='hold', fig.keep='all'}
 library(nVennR)
-listOne <- list(c('a', 'b', 'c', 'd', 'e'))
-listTwo <- list(c('d', 'e', 'f', 'g', 'h', 'i'))
-listTrhee <- list(c('a', 'b', 'g', 'h', 'e', 'x', 'y', 'z'))
-listFour <- list(c('e', 'a', 'x', 'i', 'r'))
-myV <- toVenn(listOne, listTwo, listTrhee, listFour)
+exampledf
+sas <- subset(exampledf, SAS == "Y")$Employee
+python <- subset(exampledf, Python == "Y")$Employee
+rr <- subset(exampledf, R == "Y")$Employee
+myV <- toVenn(list(sas, python, rr), sNames = c('SAS', '', 'R')) #Second name empty
+myV <- toVenn(list(SAS=sas, PYTHON=python, R=rr))
+
+```
+
+The number of sets is arbitrary. For more than five sets, the default 7000 simulation cycles may not be enough. You can set a different number of cycles with `nCycles`, or you can run the simulation repeatedly by providing the returned `nVennObj` to `toVenn`.
+
+```{r, dev='svg', fig.show='hold', fig.keep='all'}
+#myV <- toVenn(list(SAS=sas, PYTHON=python, R=rr, c("A006", "A008", "A011", "Unk"), c("A011", "Unk", "A101", "A006", "A000"), c("A101", "A006", "A008")))
+#myV <- toVenn(nVennObj = myV)
 
 ```
 

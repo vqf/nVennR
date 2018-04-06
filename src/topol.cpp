@@ -2105,6 +2105,10 @@ class borderLine
       svg.addLine("	   text-anchor: middle;");
       svg.addLine("	   alignment-baseline: central;");
       svg.addLine("  }");
+      svg.addLine("  .legend {");
+      svg.addLine("    font-family: Arial;");
+      svg.addLine("    font-size: 15px;");
+      svg.addLine("  }");
       for (i = 0; i < ngroups; i++){
         svg.addLine("  .p" + num(i) + "{");
         svg.addLine("    stroke: none;");
@@ -2614,7 +2618,7 @@ borderLine* readVennInfo(List x){
   }
   for (i = 0; i < n; i++){
     int j = i + 2 + number;
-    weights.push_back(atoi(result[j]));
+    weights.push_back(atof(result[j]));
   }
   binMap mymap(number);
   line = new borderLine(&mymap, groupNames, weights);
@@ -2632,8 +2636,8 @@ List makeVenn(List x, int nCycl, bool showProgress){
   }
   line->simulate((UINT) nCycl, showProgress);
   toret["set"] = line->saveFigure();
-  toret["reg"] = x["reg"];
-  toret["orig"] = x["orig"];
+  if (x.containsElementNamed("reg")) toret["reg"] = x["reg"];
+  if (x.containsElementNamed("orig")) toret["orig"] = x["orig"];
   return toret;
 }
 
