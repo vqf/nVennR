@@ -17,11 +17,26 @@
 #' @importFrom Rcpp sourceCpp
 NULL
 
-
-
-#' Show Venn diagram. Automatically called from toVenn.
+#' Example data frame.
 #'
-#' @param nVennObj Object with nVennR information. Can be obtained from a toVenn call.
+#' A dataset containing programming preferences from 18 employees. This data set was
+#' provided by user Krantz to inquire about nVennR
+#'
+#' @format A data frame with 18 rows and 3 variables:
+#' \describe{
+#'   \item{Employee}{Employee ID}
+#'   \item{SAS}{Employee uses SAS}
+#'   \item{Python}{Employee uses Python}
+#'   \item{R}{Employee uses R}
+#' }
+#' @source \url{https://stackoverflow.com/questions/49471565/transforming-data-to-create-generalized-quasi-proportional-venn-diagrams-using}
+"exampledf"
+
+
+
+#' Show Venn diagram. Automatically called from plotVenn.
+#'
+#' @param nVennObj Object with nVennR information. Can be obtained from a plotVenn call.
 #' @param opacity Fill opacity for the sets. Defaults to 0.4.
 #' @param borderWidth Width of set borders. Defaults to 1.
 #' @param labelRegions Show region identifiers. These are numbers in parentheses inside each region
@@ -83,6 +98,62 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemSh
   #cat("Saved to ", tfile)
 }
 
+#' This function is deprecated, only kept for backward compatibility.
+#'
+#' Please, use plotVenn instead. Please, notice that input and output are different.
+#'
+#' @param draw Show Venn diagram in the viewer as a side effect. Defaults to true.
+#' @param ... One list or vector (possibly mixed) per set. If the input
+#' is a list with a name, that name will be used for the legend.
+#' @return SVG code for the Venn diagram.
+#' @examples
+#' set1 <- c('a', 'b', 'c')
+#' set2 <- c('e', 'f', 'c')
+#' set3 <- c('c', 'b', 'e')
+#' mySVG <- toVenn(set1, set2, set3)
+#' oldShowSVG(mySVG=mySVG, opacity=0.2)
+#' @export
+toVenn <- function(..., draw=TRUE){
+  sets <- list(...)
+  nBits <- length(sets)
+  nRegions <- bitwShiftL(1, nBits)
+  result <- c("nVenn1.2", toString(nBits))
+  for (i in 1:nBits){
+    cname <- paste('name', i, sep='')
+    if (length(names(sets[[i]])) > 0){
+      cname <- names(sets[[i]])
+    }
+    result <- c(result, cname)
+  }
+  al <- unlist(sets[[1]])
+  for (i in 2:nBits){
+    al <- union(al, unlist(sets[[i]]))
+  }
+  result <- c(result, toString(0))
+  for (i in 1:(nRegions - 1)){
+    start <- al
+    belongs <- .toBin(i, nBits)
+    for (j in 1:length(belongs)){
+      k <- belongs[[j]]
+      if (k == 1){
+        start <- intersect(start, unlist(sets[[j]]))
+      }
+      else{
+        start <- setdiff(start, unlist(sets[[j]]))
+      }
+    }
+    result <- c(result, length(start))
+  }
+  cat(result, sep="\n")
+  tmp <- result
+  mySVG <- drawVenn(tmp)
+  if (draw) oldShowSVG(mySVG)
+  return(mySVG)
+}
+
+
+
+
 #' Create Venn diagram using the nVenn algorithm.
 #'
 #' This algorithm is based on a simulation
@@ -110,10 +181,10 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemSh
 #' set1 <- list(set1 = c('a', 'b', 'c'))
 #' set2 <- list(set2 = c('e', 'f', 'c'))
 #' set3 <- list(set3 = c('c', 'b', 'e'))
-#' mySVG <- toVenn(set1, set2, set3, sNames=c("One", "Two", "Three"))
-#' showSVG(mySVG=mySVG, opacity=0.2)
+#' myNV <- plotVenn(list(set1, set2, set3), sNames=c("One", "Two", "Three"))
+#' showSVG(myNV, opacity=0.2)
 #' @export
-toVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
+plotVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
                      showPlot=T, showProgress=F, ...){
   lresult <- NULL
   if (is.null(nVennObj)){
@@ -148,13 +219,44 @@ toVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
 #' @export
 getVennRegion <- function(nVennObj, region){
   tRegions <- nVennObj$reg
+  result <- NULL
   reg <- .interpretRegion(nVennObj, region)
   r <- .fromBin(reg)
-  result <- as.vector(unlist(tRegions[r]))
+  if (length(tRegions[r]) > 0){
+    result <- as.vector(unlist(tRegions[r]))
+  }
   return(result)
 }
 
-#' Get elements in a region
+#' List elements in every region
+#'
+#' @param nVennObj Object to list.
+#' @param na.rm If true, empty regions are not listed.
+#' @export
+listVennRegions <- function(nVennObj, na.rm=T){
+  nBits <- as.integer(nVennObj$def[[2]])
+  nReg <- bitwShiftL(1, nBits) - 1
+  result <- list()
+  for (i in 0:nReg){
+    rg <- .toBin(i, nBits)
+    s <- toString(rg)
+    toadd <- getVennRegion(nVennObj, rg)
+    if (is.null(toadd)){
+      if (na.rm){
+        result[[s]] <- NULL
+      }
+      else{
+        result[[s]] <- NA
+      }
+    }
+    else{
+      result[[s]] <- toadd
+    }
+  }
+  return(result)
+}
+
+#' Set number of elements in a region
 #' @param nVennObj Object describing an nVenn job.
 #' @param region Description of the region. This can be a vector with the names of the groups the region
 #' belongs to or a vector describing whether the region belongs to each set in order (i. e., c(1, 0, 0)
@@ -308,7 +410,12 @@ createVennObj <- function(nSets=1, sNames=NULL, sSizes=NULL){
         start <- setdiff(start, unlist(sets[[j]]))
       }
     }
-    regions[[i]] <- start
+    if (length(start) > 0){
+      regions[[i]] <- start
+    }
+    else{
+      regions[[i]] <- NULL
+    }
     result <- c(result, length(start))
   }
   lresult <- list()
@@ -339,4 +446,28 @@ createVennObj <- function(nSets=1, sNames=NULL, sSizes=NULL){
     result <- result + b
   }
   return(result)
+}
+
+#' Only exported for backwards compatibility with toVenn
+
+#' @param mySVG SVG code defining the diagram. Can be retrieved from toVenn.
+#' @param opacity Fill opacity for the sets. Defaults to 0.4.
+#' @param outFile File name to save SVG figure. If empty, a temp file will be created and
+#' shown in the viewer, if possible.
+#' @param systemShow Show the result in the system SVG viewer.
+#' @return Nothing. Creates a Venn diagram in svg as a side effect.
+#' @export
+oldShowSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
+  tfile = outFile
+  if (tfile == "") tfile <- tempfile(fileext = ".svg")
+  # transform SVG
+  mySVG <- sub("fill-opacity: *([^ ;]+) *;", paste("fill-opacity: ", opacity, ";"), mySVG)
+  ###############
+  cat(mySVG, file=tfile)
+  s <- magick::image_read(tfile)
+  print(s)
+  if (systemShow){
+    utils::browseURL(tfile)
+  }
+  #cat("Saved to ", tfile)
 }

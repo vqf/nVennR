@@ -27,37 +27,37 @@ There are two ways to create a Venn diagram object (`nVennObj`), which will be r
 
 ### High-level
 
-The most common use for a package like nVennR is to depict the relationships between several intersecting lists. The main function for this task is `toVenn`. The input is a list of vectors (or lists) describing each set. The name of each inner vector will be used for labelling. If inner vectors are not named, labels can be provided as a vector with `sNames`. Empty names will be filled with `GroupN`. Examples:
+The most common use for a package like nVennR is to depict the relationships between several intersecting lists. The main function for this task is `plotVenn`. The input is a list of vectors (or lists) describing each set. The name of each inner vector will be used for labelling. If inner vectors are not named, labels can be provided as a vector with `sNames`. Empty names will be filled with `GroupN`. Examples:
 
-```{r, dev='svg', fig.show='hold', fig.keep='all'}
+```{r "plotVenn", dev='svg', fig.show='hold', fig.keep='all'}
 library(nVennR)
 exampledf
 sas <- subset(exampledf, SAS == "Y")$Employee
 python <- subset(exampledf, Python == "Y")$Employee
 rr <- subset(exampledf, R == "Y")$Employee
-myV <- toVenn(list(sas, python, rr), sNames = c('SAS', '', 'R')) #Second name empty
-myV <- toVenn(list(SAS=sas, PYTHON=python, R=rr))
+myV <- plotVenn(list(sas, python, rr), sNames = c('SAS', '', 'R')) #Second name empty
+myV <- plotVenn(list(SAS=sas, PYTHON=python, R=rr))
 
 ```
 
-The number of sets is arbitrary. For more than five sets, the default 7000 simulation cycles may not be enough. You can set a different number of cycles with `nCycles`, or you can run the simulation repeatedly by providing the returned `nVennObj` to `toVenn`.
+The number of sets is arbitrary. For more than five sets, the default 7000 simulation cycles may not be enough. You can set a different number of cycles with `nCycles`, or you can run the simulation repeatedly by providing the returned `nVennObj` to `plotVenn`. Repeated execution is encouraged, as long simulations are resource-intensive.
 
-```{r, dev='svg', fig.show='hold', fig.keep='all'}
-myV2 <- toVenn(list(SAS=sas, PYTHON=python, R=rr, c("A006", "A008", "A011", "Unk"), c("A011", "Unk", "A101", "A006", "A000"), c("A101", "A006", "A008")))
-myV2 <- toVenn(nVennObj = myV2)
+```{r "Iterative", dev='svg', fig.show='hold', fig.keep='all'}
+myV2 <- plotVenn(list(SAS=sas, PYTHON=python, R=rr, c("A006", "A008", "A011", "Unk"), c("A011", "Unk", "A101", "A006", "A000"), c("A101", "A006", "A008")))
+myV2 <- plotVenn(nVennObj = myV2)
 
 ```
 
 ### Low-level
 Users can also build an nVennObj from scratch. Most of the time, this will not be useful, but it might have some theoretical applications. For instance, let us get a five-set Venn diagram (in Venn diagrams, all the regions are shown). With the high-level procedure, we would need five sets with all the possible intersections. Instead, we can use `createVennObj`:
 
-```{r dev='svg', fig.show='hold', fig.keep='all'}
+```{r "Low-level", dev='svg', fig.show='hold', fig.keep='all'}
 myV3 <- createVennObj(nSets = 5, sSizes = c(rep(1, 32)))
-myV3 <- toVenn(nVennObj = myV3)
-myV3 <- toVenn(nVennObj = myV3)
+myV3 <- plotVenn(nVennObj = myV3)
+myV3 <- plotVenn(nVennObj = myV3)
 ```
 
-Incidentally, these figures show another reason to run `toVenn` repeatedly rather than raising `nCycles`. Each time the function runs, the speed of the simulation is reset, which may make convergence much faster. If we had run `myV3 <- toVenn(nVennObj = myV3, nCyles=14000)`, the resulting figure would have been very similar to the left panel.
+Incidentally, these figures show another reason to run `plotVenn` repeatedly rather than raising `nCycles`. Each time the function runs, the speed of the simulation is reset, which may make convergence much faster. If we had run `myV3 <- plotVenn(nVennObj = myV3, nCyles=14000)`, the resulting figure would have been very similar to the left panel.
 
 The `sSizes` vector contains the values of each region of the diagram. From the help,
 
@@ -67,62 +67,56 @@ You can also read more than you want to know about this procedure [here](https:/
 
 After creating `myV3`, we can manipulate the size of each region separately with the `setVennRegion` function:
 
-```{r dev='svg'}
+```{r "setVennRegion", dev='svg'}
 myV3 <- setVennRegion(myV3, region = c("Group1", "Group3", "Group4"), value = 4) # region equivalent to c(1, 0, 1, 1, 0)
 myV3 <- setVennRegion(myV3, region = c(0, 1, 0, 0, 1), value = 8) # region equivalent to c("Group2", "Group5")
-myV3 <- toVenn(nVennObj = myV3)
+myV3 <- plotVenn(nVennObj = myV3)
 ```
 
 ## Manipulate figures
 
-Once an nVennObj has been created, you can generate the corresponding figure with `toVenn`, as shown in previous examples. If you are happy with the layout of the diagram, you do not need to run the simulation again to tweak the figure. This is better achieved with `showSVG`. At its present form, with `showSVG` you can change the colors and opacity of the sets, the width of the set borders and the font sizes of the labels.
+Once an nVennObj has been created, you can generate the corresponding figure with `plotVenn`, as shown in previous examples. If you are happy with the layout of the diagram, you do not need to run the simulation again to tweak the figure. This is better achieved with `showSVG`. At its present form, with `showSVG` you can change the colors and opacity of the sets, the width of the set borders and the font sizes of the labels.
 Opacity and border width are easy to understand:
 
-```{r dev='svg', fig.show='hold', fig.keep='all'}
+```{r "opacity", dev='svg', fig.show='hold', fig.keep='all'}
 showSVG(nVennObj = myV3, opacity = 0.1)
 showSVG(nVennObj = myV3, opacity = 0.1, borderWidth = 3)
 ```
 
 Set colors are provided as a vector, with one color per set. Colors are expressed in an SVG CSS compatible form. Please, be aware that these expressions are not evaluated. If you provide wrong colors, the SVG rendering will fail.
 
-```{r dev='svg', fig.show='hold', fig.keep='all'}
+```{r "setColors", dev='svg', fig.show='hold', fig.keep='all'}
 showSVG(nVennObj = myV3, setColors = c('#d7100b', '#ff4e02', '#eeed2f', '#067e1d', '#2b55b7'))
-showSVG(nVennObj = myV3, setColors = c('#d7100b', 'teal', 'white', 'black', '#2b55b7'))
+showSVG(nVennObj = myV3, setColors = c('#d7100b', 'teal', 'yellow', 'black', '#2b55b7'))
 ```
 
 There are two types of labels: `size labels` (large numbers) and `region labels` (smaller numbers in parentheses). They can be hidden by setting `showNumbers` and `labelRegions` to false, respectively. The font size for `size labels` is double the font size of `region labels`. In this version on `nVennR`, this ratio is fixed, but the sizes can be manipulated with `fontScale`. The number provided multiplies the default font size of the labels. Numbers larger than 2 are discouraged, as labels can overlap in the figure.
 
-```{r dev='svg', fig.show='hold', fig.keep='all'}
+```{r "showLabels", dev='svg', fig.show='hold', fig.keep='all'}
 showSVG(nVennObj = myV3, opacity = 0.1, showNumbers = F, fontScale = 2) # Avoid overlaps by hiding size labels
 showSVG(nVennObj = myV3, opacity = 0.1, labelRegions = F, fontScale = 3) # Avoid overlaps by hiding region labels
 ```
 
-## Figures
+You can set the default graphic device to export the figure generated by `showSVG`. If you set this device to a bitmap (i. e., with `png()`) you should set the width and height to get a good resolution. If you have experience with vector formats, you can edit the figure to suit your needs. Setting `systemShow` to true, will attempt to open the SVG figure in your default editor (i. e., `InkScape`). 
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+## Explore diagram
 
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+Finally, one can explore the diagram using a couple of functions. Obviously, these functions cannot be used with objects generated through low-level functions.
+
+### getVennRegion
+
+This function lists the elements belonging to a given region. The region is expressed as in `setVennRegion`:
+
+```{r "getVennRegion"}
+getVennRegion(myV, c("R", "SAS"))
+getVennRegion(myV, c(1, 1, 1))
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+### listVennRegions
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+This function returns a list of all the regions in the diagram. In turn, each region contains a list of the elements in it. Empty regions can be listed by setting `na.rm` to `FALSE`.
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r "listVennRegions"}
+listVennRegions(myV)
+listVennRegions(myV, na.rm = F)
 ```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))

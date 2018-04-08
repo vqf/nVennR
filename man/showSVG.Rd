@@ -2,14 +2,14 @@
 % Please edit documentation in R/hello.R
 \name{showSVG}
 \alias{showSVG}
-\title{Show Venn diagram. Automatically called from toVenn.}
+\title{Show Venn diagram. Automatically called from plotVenn.}
 \usage{
 showSVG(nVennObj, opacity = 0.4, borderWidth = 1, outFile = "",
   systemShow = FALSE, showProgress = FALSE, labelRegions = T,
   showNumbers = T, setColors = NULL, fontScale = 1)
 }
 \arguments{
-\item{nVennObj}{Object with nVennR information. Can be obtained from a toVenn call.}
+\item{nVennObj}{Object with nVennR information. Can be obtained from a plotVenn call.}
 
 \item{opacity}{Fill opacity for the sets. Defaults to 0.4.}
 
@@ -37,5 +37,5 @@ be multiplied by this factor. Values larger than 2 will probably make labels cla
 Nothing. Creates a Venn diagram in svg as a side effect.
 }
 \description{
-Show Venn diagram. Automatically called from toVenn.
+Show Venn diagram. Automatically called from plotVenn.
 }

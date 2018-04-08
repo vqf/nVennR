@@ -17,7 +17,7 @@ This is a new release, so there are no reverse dependencies.
 
 ## Resubmission
 
-This is a resubmission with a patch. In this version I have:
+This is a major revision with new functions. In this version I have:
 
 * Changed the version number. 
   

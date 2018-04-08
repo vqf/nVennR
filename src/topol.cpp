@@ -2546,10 +2546,10 @@ class borderLine
     }
   };
 
-void fcall_progress(int x, int xmax){
+void fcall(StringVector x){
   Environment env("package:nVennR");
-  Function f = env["svMisc::progress"];
-  f(x, xmax);
+  Function f = env["oldShowSVG"];
+  f(x);
 }
 
 
@@ -2589,7 +2589,7 @@ StringVector drawVenn(StringVector x) {
     StringVector tr;
     string thtml = lines.toSVG();
     tr.push_back(thtml);
-    //fcall(tr);
+    fcall(tr);
     goon = false;
     string yo = Rcpp::as<std::string>(as_char(readline("> More cycles? (y/n) ")));
     if (yo == "y"){

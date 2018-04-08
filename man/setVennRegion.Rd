@@ -2,7 +2,7 @@
 % Please edit documentation in R/hello.R
 \name{setVennRegion}
 \alias{setVennRegion}
-\title{Get elements in a region}
+\title{Set number of elements in a region}
 \usage{
 setVennRegion(nVennObj, region, value)
 }
@@ -19,5 +19,5 @@ means the region belongs to set 1 and does not belong to sets 2 and 3).}
 Modified nVennObj
 }
 \description{
-Get elements in a region
+Set number of elements in a region
 }
