@@ -11,7 +11,7 @@
 
 ## Reverse dependencies
 
-This is a new release, so there are no reverse dependencies.
+No reverse dependencies.
 
 ---
 
@@ -21,6 +21,6 @@ This is a major revision with new functions. In this version I have:
 
 * Changed the version number. 
   
-* Fixed a problem with the persistence of public variables. Repeated execution of toVenn led to slower convergence. Thanks to Frank Ruge for pointing this out.
+* Added multiple functions, all documented and tested.
 
-* I apologize about this untimely update. It covers a bug I thought I had fixed, but there was a case I had not foreseen. Hopefully, no more updates will be needed in the following months.
+* Added a vignette to explain the new workflow. Since functions in this packages perform complex simulations, the vignette takes about 20 seconds to compile on my computer. I have tried to minimize compilation time and file size.

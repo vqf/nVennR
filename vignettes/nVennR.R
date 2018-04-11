@@ -1,51 +1,64 @@
 ## ----setup, include = FALSE----------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dev = "svg",
+  fig.show='hold', 
+  fig.keep='all'
 )
+library(knitr)
+local({
+  hook_plot = knit_hooks$get('plot')
+  knit_hooks$set(plot = function(x, options) {
+    x = paste(x, collapse = '.')
+    if (!grepl('\\.svg', x)) return(hook_plot(x, options))
+    # read the content of the svg image and write it out without <?xml ... ?>
+    paste(readLines(x)[-1], collapse = '\n')
+  })
+})
 
-## ----"plotVenn", dev='svg', fig.show='hold', fig.keep='all'--------------
+## ----"plotVenn"----------------------------------------------------------
 library(nVennR)
 exampledf
 sas <- subset(exampledf, SAS == "Y")$Employee
 python <- subset(exampledf, Python == "Y")$Employee
 rr <- subset(exampledf, R == "Y")$Employee
-myV <- plotVenn(list(sas, python, rr), sNames = c('SAS', '', 'R')) #Second name empty
-myV <- plotVenn(list(SAS=sas, PYTHON=python, R=rr))
+myV <- plotVenn(list(SAS=sas, PYTHON=python, R=rr), nCycles = 2000)
 
 
-## ----"Iterative", dev='svg', fig.show='hold', fig.keep='all'-------------
+## ----"Iterative"---------------------------------------------------------
 myV2 <- plotVenn(list(SAS=sas, PYTHON=python, R=rr, c("A006", "A008", "A011", "Unk"), c("A011", "Unk", "A101", "A006", "A000"), c("A101", "A006", "A008")))
 myV2 <- plotVenn(nVennObj = myV2)
 
 
-## ----"Low-level", dev='svg', fig.show='hold', fig.keep='all'-------------
+## ----"Low-level", fig.keep='last'----------------------------------------
 myV3 <- createVennObj(nSets = 5, sSizes = c(rep(1, 32)))
 myV3 <- plotVenn(nVennObj = myV3)
 myV3 <- plotVenn(nVennObj = myV3)
 
-## ----"setVennRegion", dev='svg'------------------------------------------
+## ----"setVennRegion"-----------------------------------------------------
 myV3 <- setVennRegion(myV3, region = c("Group1", "Group3", "Group4"), value = 4) # region equivalent to c(1, 0, 1, 1, 0)
 myV3 <- setVennRegion(myV3, region = c(0, 1, 0, 0, 1), value = 8) # region equivalent to c("Group2", "Group5")
-myV3 <- plotVenn(nVennObj = myV3)
+myV3 <- plotVenn(nVennObj = myV3, nCycles = 3000)
 
-## ----"opacity", dev='svg', fig.show='hold', fig.keep='all'---------------
-showSVG(nVennObj = myV3, opacity = 0.1)
+## ----"opacity"-----------------------------------------------------------
 showSVG(nVennObj = myV3, opacity = 0.1, borderWidth = 3)
 
-## ----"setColors", dev='svg', fig.show='hold', fig.keep='all'-------------
-showSVG(nVennObj = myV3, setColors = c('#d7100b', '#ff4e02', '#eeed2f', '#067e1d', '#2b55b7'))
+## ----"setColors"---------------------------------------------------------
 showSVG(nVennObj = myV3, setColors = c('#d7100b', 'teal', 'yellow', 'black', '#2b55b7'))
 
-## ----"showLabels", dev='svg', fig.show='hold', fig.keep='all'------------
-showSVG(nVennObj = myV3, opacity = 0.1, showNumbers = F, fontScale = 2) # Avoid overlaps by hiding size labels
+## ----"showLabels"--------------------------------------------------------
 showSVG(nVennObj = myV3, opacity = 0.1, labelRegions = F, fontScale = 3) # Avoid overlaps by hiding region labels
+
+## ----"directPlot"--------------------------------------------------------
+myV4 <- plotVenn(list(a=c(1, 2, 3), b=c(3, 4, 5), c=c(3, 6, 1)), nCycles = 2000, setColors=c('red', 'green', 'blue'), labelRegions=F, fontScale=2, opacity=0.2, borderWidth=2)
 
 ## ----"getVennRegion"-----------------------------------------------------
 getVennRegion(myV, c("R", "SAS"))
 getVennRegion(myV, c(1, 1, 1))
 
 ## ----"listVennRegions"---------------------------------------------------
-listVennRegions(myV)
-listVennRegions(myV, na.rm = F)
+
+listVennRegions(myV4)
+listVennRegions(myV4, na.rm = F)
 

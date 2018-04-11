@@ -239,7 +239,7 @@ listVennRegions <- function(nVennObj, na.rm=T){
   result <- list()
   for (i in 0:nReg){
     rg <- .toBin(i, nBits)
-    s <- toString(rg)
+    s <- paste0(toString(rg), ' (', toString(.regionToString(nVennObj, rg)), ')')
     toadd <- getVennRegion(nVennObj, rg)
     if (is.null(toadd)){
       if (na.rm){
@@ -328,6 +328,17 @@ createVennObj <- function(nSets=1, sNames=NULL, sSizes=NULL){
   offs <- nSets + 3
   n <- bitwShiftL(1, nSets) + offs - 1
   return(nVennObj$def[offs:n])
+}
+
+.getSets <- function(nVennObj){
+  n <- as.numeric(nVennObj$def[[2]]) + 2
+  return(nVennObj$def[3:n])
+}
+
+.regionToString <- function(nVennObj, region){
+  s <- as.data.frame(list(sets=.getSets(nVennObj), bins=region))
+  result <- s[s$bins == 1,]$sets
+  return(result)
 }
 
 .interpretRegion <- function(nVennObj, region){
