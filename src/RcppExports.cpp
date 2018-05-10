@@ -17,35 +17,33 @@ BEGIN_RCPP
 END_RCPP
 }
 // makeVenn
-List makeVenn(List x, int nCycl, bool showProgress);
-RcppExport SEXP _nVennR_makeVenn(SEXP xSEXP, SEXP nCyclSEXP, SEXP showProgressSEXP) {
+List makeVenn(List x, int nCycl);
+RcppExport SEXP _nVennR_makeVenn(SEXP xSEXP, SEXP nCyclSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type nCycl(nCyclSEXP);
-    Rcpp::traits::input_parameter< bool >::type showProgress(showProgressSEXP);
-    rcpp_result_gen = Rcpp::wrap(makeVenn(x, nCycl, showProgress));
+    rcpp_result_gen = Rcpp::wrap(makeVenn(x, nCycl));
     return rcpp_result_gen;
 END_RCPP
 }
 // refineVenn
-StringVector refineVenn(List x, bool showProgress);
-RcppExport SEXP _nVennR_refineVenn(SEXP xSEXP, SEXP showProgressSEXP) {
+StringVector refineVenn(List x);
+RcppExport SEXP _nVennR_refineVenn(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type x(xSEXP);
-    Rcpp::traits::input_parameter< bool >::type showProgress(showProgressSEXP);
-    rcpp_result_gen = Rcpp::wrap(refineVenn(x, showProgress));
+    rcpp_result_gen = Rcpp::wrap(refineVenn(x));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_nVennR_drawVenn", (DL_FUNC) &_nVennR_drawVenn, 1},
-    {"_nVennR_makeVenn", (DL_FUNC) &_nVennR_makeVenn, 3},
-    {"_nVennR_refineVenn", (DL_FUNC) &_nVennR_refineVenn, 2},
+    {"_nVennR_makeVenn", (DL_FUNC) &_nVennR_makeVenn, 2},
+    {"_nVennR_refineVenn", (DL_FUNC) &_nVennR_refineVenn, 1},
     {NULL, NULL, 0}
 };
 

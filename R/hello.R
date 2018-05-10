@@ -49,16 +49,15 @@ NULL
 #' @param systemShow Show the result in the system SVG viewer (i. e., Inkscape).
 #' @param fontScale Multiplier for font sizes. The font size of both numbers and region labels will
 #' be multiplied by this factor. Values larger than 2 will probably make labels clash.
-#' @param showProgress Show progress bar during computation.
 #' @return Nothing. Creates a Venn diagram in svg as a side effect.
 #' @export
-showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemShow=FALSE, showProgress=FALSE,
+showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemShow=FALSE,
                     labelRegions=T, showNumbers=T, setColors=NULL, fontScale=1){
   nSets <- nVennObj$def[[2]]
   tfile = outFile
   if (tfile == "") tfile <- tempfile(fileext = ".svg")
   tfile2 <- tempfile(fileext = ".svg")
-  nVennObj$svg <- refineVenn(nVennObj, showProgress)
+  nVennObj$svg <- refineVenn(nVennObj)
   # transform SVG
   nVennObj$svg <- sub("fill-opacity: *([^ ;]+) *;", paste("fill-opacity: ", opacity, ";"), nVennObj$svg)
   nVennObj$svg <- sub("stroke-width: *([^ ;]+) *;", paste("stroke-width: ", borderWidth, ";"), nVennObj$svg)
@@ -170,7 +169,6 @@ toVenn <- function(..., draw=TRUE){
 #' should be enough. Even for more complex scenarios, it may be better to run the function repeatedly,
 #' as a large number of cycles may take up too many resources.
 #' @param showPlot Show the result in the graphic device.
-#' @param showProgress Show progress bar during computation.
 #' @param sets List of lists with the input sets.
 #' @param ... Options for `showSVG`
 #' If input lists have names, those names will be used for the legend. If not, names can be
@@ -185,7 +183,7 @@ toVenn <- function(..., draw=TRUE){
 #' showSVG(myNV, opacity=0.2)
 #' @export
 plotVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
-                     showPlot=T, showProgress=F, ...){
+                     showPlot=T, ...){
   lresult <- NULL
   if (is.null(nVennObj)){
     sets <- .flattenInput(sets, sNames=sNames)
@@ -203,9 +201,9 @@ plotVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
     message("All regions are zero. The resulting diagram will probably be blank.")
     message("If you still want the diagram, you can set nCycles to zero.")
   }
-  myVenn <- makeVenn(lresult, nCycles, showProgress)
+  myVenn <- makeVenn(lresult, nCycles)
   class(myVenn) <- append(class(myVenn), "nVennObj")
-  if (showPlot == T) showSVG(myVenn, showProgress = showProgress, ...)
+  if (showPlot == T) showSVG(myVenn, ...)
   return(myVenn)
 }
 

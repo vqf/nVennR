@@ -16,12 +16,12 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
 Depends: R (>= 2.10)
-LinkingTo: Rcpp, RcppProgress
-Imports: Rcpp, RcppProgress,
-    grImport2,
-    rsvg
+LinkingTo: Rcpp
+Imports: Rcpp,
+    grImport2
 Suggests: testthat,
     knitr,
     rmarkdown,
+    rsvg,
     magick
 VignetteBuilder: knitr
