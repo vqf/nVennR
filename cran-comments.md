@@ -1,11 +1,11 @@
 ## Test environments
-* local OS X install, R 3.4.4
-* ubuntu 12.04 (on travis-ci), R 3.4.4
+* local OS X install, R 3.5.0
+* ubuntu 12.04 (on travis-ci), R 3.5.0
 * win-builder (devel and release)
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 note
+0 errors | 0 warnings | 1 note
 
 * This is a new release.
 
@@ -15,12 +15,14 @@ No reverse dependencies.
 
 ---
 
-## Resubmission
+Version 0.2.1. No major changes. Some non-essential dependencies caused problems in certain platforms, therefore:
 
-This is a major revision with new functions. In this version I have:
 
-* Changed the version number. 
+* I have removed the code referencing RcppProgress.
+
+* I have moved rsvg and grImport2 to the Suggests sections. If they are installed, the package should work as before. If they are not installed, there is no output to the plot window, but users can still export the result.
+
+* I have run R CMD check with devtools::check(cleanup = FALSE, args = c('--as-cran')) .
   
-* Added multiple functions, all documented and tested.
+Like in the previous version, the vignette is large (about 3.7 Mb).
 
-* Added a vignette to explain the new workflow. Since functions in this packages perform complex simulations, the vignette takes about 20 seconds to compile on my computer. I have tried to minimize compilation time and file size.
