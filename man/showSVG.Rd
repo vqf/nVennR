@@ -5,8 +5,8 @@
 \title{Show Venn diagram. Automatically called from plotVenn.}
 \usage{
 showSVG(nVennObj, opacity = 0.4, borderWidth = 1, outFile = "",
-  systemShow = FALSE, showProgress = FALSE, labelRegions = T,
-  showNumbers = T, setColors = NULL, fontScale = 1)
+  systemShow = FALSE, labelRegions = T, showNumbers = T,
+  setColors = NULL, fontScale = 1)
 }
 \arguments{
 \item{nVennObj}{Object with nVennR information. Can be obtained from a plotVenn call.}
@@ -19,8 +19,6 @@ showSVG(nVennObj, opacity = 0.4, borderWidth = 1, outFile = "",
 sent to the graphic device.}
 
 \item{systemShow}{Show the result in the system SVG viewer (i. e., Inkscape).}
-
-\item{showProgress}{Show progress bar during computation.}
 
 \item{labelRegions}{Show region identifiers. These are numbers in parentheses inside each region
 indicating which sets that region belongs to. Defaults to true}

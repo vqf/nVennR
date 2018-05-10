@@ -86,11 +86,15 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemSh
   #print(nVennObj$svg)
   ###############
   cat(nVennObj$svg, file=tfile)
-  rsvg::rsvg_svg(svg = tfile, tfile2)
-  #s <- magick::image_read(tfile)
-  #print(s)
-  p <- grImport2::readPicture(tfile2)
-  grImport2::grid.picture(p)
+  #if (requireNamespace("rsvg", quietly = TRUE)) {
+  #  rsvg::rsvg_svg(svg = tfile, tfile2)
+  #  #s <- magick::image_read(tfile)
+  #  #print(s)
+  #  p <- grImport2::readPicture(tfile2)
+  #  grImport2::grid.picture(p)
+  #} else {
+  #  warning("The figure cannot be rendered in the plot window. Please, use the arguments outFile and/or systemShow.")
+  #}
   if (systemShow){
     utils::browseURL(tfile)
   }
