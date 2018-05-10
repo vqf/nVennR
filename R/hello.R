@@ -93,7 +93,9 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemSh
     p <- grImport2::readPicture(tfile2)
     grImport2::grid.picture(p)
   } else {
-    warning("The figure cannot be rendered in the plot window. Please, use the arguments outFile and/or systemShow.")
+    if (systemShow == FALSE && outFile == FALSE){
+      warning("The figure cannot be rendered in the plot window. Please, use the arguments outFile and/or systemShow.")
+    }
   }
   if (systemShow){
     utils::browseURL(tfile)
