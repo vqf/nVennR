@@ -2069,7 +2069,7 @@ class borderLine
       string tst;
       point svgtemp;
       initPoint(&svgtemp);
-      svg.addLine("<svg width=\"700\" height=\"500\">");
+      svg.addLine("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"700\" height=\"500\">");
       svg.addLine("<defs>");
       svg.addLine("<style type=\"text/css\"><![CDATA[");
       svg.addLine("  .borderLine {");
@@ -2106,6 +2106,9 @@ class borderLine
       svg.addLine("  .legend {");
       svg.addLine("    font-family: Arial;");
       svg.addLine("    font-size: 15px;");
+      svg.addLine("  }");
+      svg.addLine("  #legendBox {");
+      svg.addLine("    display: inline;");
       svg.addLine("  }");
       for (i = 0; i < ngroups; i++){
         svg.addLine("  .p" + num(i) + "{");
@@ -2207,6 +2210,7 @@ class borderLine
       float rh = 15.0f;
       float dy = 40.0f;
       float dx = 40.0f;
+      svg.addLine("<g id=\"legendBox\">");
       for (l = 0; l < ngroups; l++){
         string g = groups[l];
         char myg[50]; sprintf(myg, "p%d", l);
@@ -2224,6 +2228,7 @@ class borderLine
         svg.addLine(addLegend);
         cy += dy;
       }
+      svg.addLine("</g>");
       svg.addLine("</svg>");
       return svg.getText();
     }

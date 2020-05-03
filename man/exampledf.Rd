@@ -4,13 +4,15 @@
 \name{exampledf}
 \alias{exampledf}
 \title{Example data frame.}
-\format{A data frame with 18 rows and 3 variables:
+\format{
+A data frame with 18 rows and 3 variables:
 \describe{
   \item{Employee}{Employee ID}
   \item{SAS}{Employee uses SAS}
   \item{Python}{Employee uses Python}
   \item{R}{Employee uses R}
-}}
+}
+}
 \source{
 \url{https://stackoverflow.com/questions/49471565/transforming-data-to-create-generalized-quasi-proportional-venn-diagrams-using}
 }

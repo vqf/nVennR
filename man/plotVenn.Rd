@@ -4,8 +4,14 @@
 \alias{plotVenn}
 \title{Create Venn diagram using the nVenn algorithm.}
 \usage{
-plotVenn(sets, nVennObj = NULL, nCycles = 7000, sNames = NULL,
-  showPlot = T, ...)
+plotVenn(
+  sets,
+  nVennObj = NULL,
+  nCycles = 7000,
+  sNames = NULL,
+  showPlot = T,
+  ...
+)
 }
 \arguments{
 \item{sets}{List of lists with the input sets.}

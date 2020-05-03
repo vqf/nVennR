@@ -4,9 +4,18 @@
 \alias{showSVG}
 \title{Show Venn diagram. Automatically called from plotVenn.}
 \usage{
-showSVG(nVennObj, opacity = 0.4, borderWidth = 1, outFile = "",
-  systemShow = FALSE, labelRegions = T, showNumbers = T,
-  setColors = NULL, fontScale = 1)
+showSVG(
+  nVennObj,
+  opacity = 0.4,
+  borderWidth = 1,
+  showLegend = T,
+  outFile = "",
+  systemShow = FALSE,
+  labelRegions = T,
+  showNumbers = T,
+  setColors = NULL,
+  fontScale = 1
+)
 }
 \arguments{
 \item{nVennObj}{Object with nVennR information. Can be obtained from a plotVenn call.}
@@ -14,6 +23,8 @@ showSVG(nVennObj, opacity = 0.4, borderWidth = 1, outFile = "",
 \item{opacity}{Fill opacity for the sets. Defaults to 0.4.}
 
 \item{borderWidth}{Width of set borders. Defaults to 1.}
+
+\item{showLegend}{Boolean stating whether the resulting figure should contain a legend. Defaults to true.}
 
 \item{outFile}{File name to save SVG figure. If empty, a temp file will be created and
 sent to the graphic device.}

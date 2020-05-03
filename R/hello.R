@@ -39,6 +39,7 @@ NULL
 #' @param nVennObj Object with nVennR information. Can be obtained from a plotVenn call.
 #' @param opacity Fill opacity for the sets. Defaults to 0.4.
 #' @param borderWidth Width of set borders. Defaults to 1.
+#' @param showLegend Boolean stating whether the resulting figure should contain a legend. Defaults to true.
 #' @param labelRegions Show region identifiers. These are numbers in parentheses inside each region
 #' indicating which sets that region belongs to. Defaults to true
 #' @param showNumbers Show how many elements belong to each region (large numbers in the figure).
@@ -51,9 +52,10 @@ NULL
 #' be multiplied by this factor. Values larger than 2 will probably make labels clash.
 #' @return Nothing. Creates a Venn diagram in svg as a side effect.
 #' @export
-showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemShow=FALSE,
+showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, showLegend=T, outFile='', systemShow=FALSE,
                     labelRegions=T, showNumbers=T, setColors=NULL, fontScale=1){
   nSets <- nVennObj$def[[2]]
+  dleg <- ifelse(showLegend, "inline", "none")
   tfile = outFile
   if (tfile == "") tfile <- tempfile(fileext = ".svg")
   tfile2 <- tempfile(fileext = ".svg")
@@ -61,6 +63,7 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemSh
   # transform SVG
   nVennObj$svg <- sub("fill-opacity: *([^ ;]+) *;", paste("fill-opacity: ", opacity, ";"), nVennObj$svg)
   nVennObj$svg <- sub("stroke-width: *([^ ;]+) *;", paste("stroke-width: ", borderWidth, ";"), nVennObj$svg)
+  nVennObj$svg <- sub("display: *([^ ;]+) *;", paste("display: ", dleg, ";"), nVennObj$svg)
   if (!labelRegions){
     nVennObj$svg <- sub("belong *\\{", paste("belong \\{", "\n", "display: none;"), nVennObj$svg)
   }
@@ -87,12 +90,20 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemSh
   ###############
   cat(nVennObj$svg, file=tfile)
   if (requireNamespace("rsvg", quietly = TRUE) && requireNamespace("grImport2", quietly = TRUE)) {
-    rsvg::rsvg_svg(svg = tfile, tfile2)
-    p <- grImport2::readPicture(tfile2)
-    grImport2::grid.picture(p)
+    out <- tryCatch(
+      {
+        rsvg::rsvg_svg(svg = tfile, tfile2)
+        p <- grImport2::readPicture(tfile2)
+        grImport2::grid.picture(p)
+      },
+      error=function(cond){
+        message(paste("rsvg or grImport2 reported an error: ", cond))
+        message("The figure cannot be rendered in the plot window. Please, use the arguments outFile and/or systemShow.")
+      }
+    )
   } else {
     if (systemShow == FALSE && outFile == ''){
-      warning("The figure cannot be rendered in the plot window. Please, use the arguments outFile and/or systemShow.")
+      message("The figure cannot be rendered in the plot window. Please, use the arguments outFile and/or systemShow.")
     }
   }
   if (systemShow){

@@ -7,8 +7,10 @@ output:
     toc: true
 vignette: >
   %\VignetteIndexEntry{Using nVennR to generate and explore n-dimensional, quasi-proportional Venn diagrams}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include = FALSE}
@@ -42,7 +44,7 @@ There are two ways to create a Venn diagram object (`nVennObj`), which will be r
 
 ### High-level
 
-The most common use for a package like nVennR is to depict the relationships between several intersecting lists. The main function for this task is `plotVenn`. The input is a list of vectors (or lists) describing each set. The name of each inner vector will be used for labelling. If inner vectors are not named, labels can be provided as a vector with `sNames`. Empty names will be filled with `GroupN`. Examples:
+The most common use for a package like nVennR is to depict the relationships between several intersecting lists. The main function for this task is `plotVenn`. The input is a list of vectors (or lists) describing each set. The name of each inner vector will be used for labeling. If inner vectors are not named, labels can be provided as a vector with `sNames`. Empty names will be filled with `GroupN`. Examples:
 
 ```{r "plotVenn"}
 library(nVennR)

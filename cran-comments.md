@@ -5,7 +5,7 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors v | 0 warnings v | 0 notes v
 
 * This is a new release.
 
@@ -15,12 +15,11 @@ No reverse dependencies.
 
 ---
 
-Version 0.2.1. No major changes. Some non-essential dependencies caused problems in certain platforms, therefore:
+Version 0.2.2. No major changes. rsvg seems to show errors in certain platforms, therefore I have enclosed the relevant parts of showSVG in a tryCatch loop. Other issues:
 
+* The root svg element now has xmlns and xlink options. In some cases, this may help external editors to read the resulting file. Nevertheless, some versions of Adobe Illustrator do not import the resulting svg correctly.
 
-* I have removed the code referencing RcppProgress.
-
-* I have moved rsvg and grImport2 to the Suggests sections. If they are installed, the package should work as before. If they are not installed, there is no output to the plot window, but users can still export the result.
+* I have added a showLegend option to showSVG.
 
 * I have run R CMD check with devtools::check(cleanup = FALSE, args = c('--as-cran')) .
   
