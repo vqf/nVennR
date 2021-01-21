@@ -43,7 +43,7 @@ Defaults to true}
 be multiplied by this factor. Values larger than 2 will probably make labels clash.}
 }
 \value{
-Nothing. Creates a Venn diagram in svg as a side effect.
+Processed nVenn object. Creates a Venn diagram in svg as a side effect.
 }
 \description{
 Show Venn diagram. Automatically called from plotVenn.

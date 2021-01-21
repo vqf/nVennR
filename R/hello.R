@@ -50,7 +50,7 @@ NULL
 #' @param systemShow Show the result in the system SVG viewer (i. e., Inkscape).
 #' @param fontScale Multiplier for font sizes. The font size of both numbers and region labels will
 #' be multiplied by this factor. Values larger than 2 will probably make labels clash.
-#' @return Nothing. Creates a Venn diagram in svg as a side effect.
+#' @return Processed nVenn object. Creates a Venn diagram in svg as a side effect.
 #' @export
 showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, showLegend=T, outFile='', systemShow=FALSE,
                     labelRegions=T, showNumbers=T, setColors=NULL, fontScale=1){
@@ -109,6 +109,7 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, showLegend=T, outFil
   if (systemShow){
     utils::browseURL(tfile)
   }
+  return(nVennObj)
 }
 
 
@@ -162,7 +163,7 @@ plotVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
   }
   myVenn <- makeVenn(lresult, nCycles)
   class(myVenn) <- append(class(myVenn), "nVennObj")
-  if (showPlot == T) showSVG(myVenn, ...)
+  if (showPlot == T) myVenn <- showSVG(myVenn, ...)
   return(myVenn)
 }
 

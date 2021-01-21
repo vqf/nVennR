@@ -1,0 +1,18 @@
+citHeader("To cite nVennR in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "nVenn: generalized, quasi-proportional Venn and Euler diagrams",
+  author   = c(person("Jose G.", "Perez-Silva"),
+               person("Miguel", "Araujo-Voces"),
+               person("Victor", "Quesada")),
+  journal  = "Bioinformatics",
+  year     = 2018,
+  volume   = 34,
+  number   = 13,
+  pages    = "2322–2324",
+  url      = "https://doi.org/10.1093/bioinformatics/bty109",
+  textVersion = paste(
+
+  )
+)

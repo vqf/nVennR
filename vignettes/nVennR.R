@@ -1,20 +1,18 @@
-## ----setup, include = FALSE---------------------------------------------------
+## ----setup, F, include = FALSE------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  dev = "svg",
   fig.show='hold', 
   fig.keep='all'
 )
 library(knitr)
+library(nVennR)
 local({
-  hook_plot = knit_hooks$get('plot')
-  knit_hooks$set(plot = function(x, options) {
-    x = paste(x, collapse = '.')
-    if (!grepl('\\.svg', x)) return(hook_plot(x, options))
-    # read the content of the svg image and write it out without <?xml ... ?>
-    paste(readLines(x)[-1], collapse = '\n')
-  })
+  knit_hooks$set(
+    plot = function(x, options) { 
+      
+    })
+    
 })
 
 ## ----"plotVenn"---------------------------------------------------------------

@@ -15,7 +15,7 @@ No reverse dependencies.
 
 ---
 
-Version 0.2.2. No major changes. rsvg seems to show errors in certain platforms, therefore I have enclosed the relevant parts of showSVG in a tryCatch loop. Other issues:
+Version 0.2.3. No major changes. rsvg seems to show errors in certain platforms, therefore I have enclosed the relevant parts of showSVG in a tryCatch loop. Other issues:
 
 * The root svg element now has xmlns and xlink options. In some cases, this may help external editors to read the resulting file. Nevertheless, some versions of Adobe Illustrator do not import the resulting svg correctly.
 
