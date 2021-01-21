@@ -1,0 +1,84 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.show = 'hide'
+)
+library(knitr)
+uuid <- function() {
+  hex_digits <- c(as.character(0:9), letters[1:6])
+  hex_digits <- toupper(hex_digits)
+  paste(sample(hex_digits, 8), collapse='')
+}
+
+subsuid <- function(regex, strng){
+  l <- gregexpr(regex, strng, perl = T)
+  for (x in regmatches(strng, l)){ 
+    m <- regexpr('([^\\{ \\.\\#]+)', x, perl = T)
+    names <- regmatches(x, m)
+    gstr = strng
+    for (name in names){
+      nname <- paste('([^\\d\\w<>]', name, ')', sep="")
+      gstr <- gsub(nname, paste('\\1', '_', uuid(), sep=""), gstr, perl = T) 
+    }
+    return(gstr)
+  }
+}
+
+knit_print.nVennR = function(x, ...) {
+  if (is.null(x$svg)){
+    x <- showSVG(x)
+  }
+  s <- subsuid('[\\.\\#](.+?)\\s*\\{', x$svg)
+  s <- subsuid('bl\\d+', s)
+  knitr::asis_output(s)
+}
+# register the method
+registerS3method("knit_print", "nVennObj", knit_print.nVennR)
+local({
+  hook_source <- knitr::knit_hooks$get('source')
+  knitr::knit_hooks$set(source = function(x, options) {
+    x <- x[!grepl('#noshow$', x)]
+    hook_source(x, options)
+  })
+})
+```
+
+# nVennR
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/vqf/nVennR3/workflows/R-CMD-check/badge.svg)](https://github.com/vqf/nVennR3/actions)
+<!-- badges: end -->
+
+nVennR provides an R interface to the [nVenn algorithm](http://dx.doi.org/10.1093/bioinformatics/bty109) to create quasi-proportional Venn and Euler diagrams with an arbitrary number of sets.
+
+## Installation
+
+You can install the released version of nVennR from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("nVennR")
+```
+
+And the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("vqf/nVennR3")
+```
+## Example
+
+This is a basic example:
+
+```{r example}
+library(nVennR)
+myV <- plotVenn(list(set1=c(1, 2, 3), set2=c(2, 3, 4), set3=c(3, 4, 5, 'a', 'b'), set4=c(5, 6, 1, 4)))
+myV #noshow
+listVennRegions(myV)
+```
