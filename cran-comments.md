@@ -19,7 +19,7 @@ Version 0.2.3. No major changes:
 
 * Previous versions of the vignette used Cairo svg(), as the output of the plotting functions is svg code. In this version, I have implemented hooks to show the result svg directly in the html result. As a result, the vignette is not as large as before (327 Kb).
 
-* I have run R CMD check with devtools::check(cleanup = FALSE, args = c('--as-cran')) .
+* I have run R CMD check with `devtools::check(cleanup = FALSE, args = c('--as-cran'))`.
   
-* I have run tests on rhub
+* I have run tests on rhub with `rhub::check_for_cran()`.
 
