@@ -21,5 +21,5 @@ Version 0.2.3. No major changes:
 
 * I have run R CMD check with devtools::check(cleanup = FALSE, args = c('--as-cran')) .
   
-Like in the previous version, the vignette is large (about 3.7 Mb).
+* I have run tests on rhub
 
