@@ -23,3 +23,5 @@ Version 0.2.3. No major changes:
   
 * I have run tests on rhub with `rhub::check_for_cran()`. 
 
+* I have added a badge for tests in `travis-ci.com`.
+
