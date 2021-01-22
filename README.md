@@ -27,7 +27,7 @@ And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("vqf/nVennR3")
+devtools::install_github("vqf/nVennR")
 ```
 
 ## Example
