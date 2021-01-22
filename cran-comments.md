@@ -15,11 +15,9 @@ No reverse dependencies.
 
 ---
 
-Version 0.2.3. No major changes. rsvg seems to show errors in certain platforms, therefore I have enclosed the relevant parts of showSVG in a tryCatch loop. Other issues:
+Version 0.2.3. No major changes:
 
-* The root svg element now has xmlns and xlink options. In some cases, this may help external editors to read the resulting file. Nevertheless, some versions of Adobe Illustrator do not import the resulting svg correctly.
-
-* I have added a showLegend option to showSVG.
+* Previous versions of the vignette used Cairo svg(), as the output of the plotting functions is svg code. In this version, I have implemented hooks to show the result svg directly in the html result. As a result, the vignette is not as large as before (327 Kb).
 
 * I have run R CMD check with devtools::check(cleanup = FALSE, args = c('--as-cran')) .
   
