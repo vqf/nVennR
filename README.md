@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Build
-Status](https://travis-ci.org/vqf/nVennR3.svg?branch=master)](https://travis-ci.org/vqf/nVennR3)
+Status](https://travis-ci.com/vqf/nVennR.svg?branch=master)](https://travis-ci.com/vqf/nVennR)
 <!-- badges: end -->
 
 nVennR provides an R interface to the [nVenn
