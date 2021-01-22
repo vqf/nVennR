@@ -21,5 +21,5 @@ Version 0.2.3. No major changes:
 
 * I have run R CMD check with `devtools::check(cleanup = FALSE, args = c('--as-cran'))`.
   
-* I have run tests on rhub with `rhub::check_for_cran()`.
+* I have run tests on rhub with `rhub::check_for_cran()`. 
 
