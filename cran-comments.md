@@ -22,7 +22,7 @@ Version 0.2.3. No major changes:
 
 * I have run R CMD check with `devtools::check(cleanup = FALSE, args = c('--as-cran'))`.
   
-* I have run tests on rhub with `rhub::check_for_cran()`. 
+* I have run tests on rhub with rhub::check_for_cran(env_vars = c(`_R_CHECK_FORCE_SUGGESTS_`="false")). 
 
 * I have added a `Readme` with a badge for tests in `travis-ci.com`.
 
