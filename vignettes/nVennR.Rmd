@@ -60,7 +60,7 @@ local({
 })
 ```
 
-nVennR provides an R interface to the [nVenn algorithm](http://dx.doi.org/10.1093/bioinformatics/bty109). This vignette intends to illustrate three basic uses of nVennR:
+nVennR provides an R interface to the [nVenn algorithm](https://academic.oup.com/bioinformatics/article/34/13/2322/4904268). This vignette intends to illustrate three basic uses of nVennR:
 
 * Create Venn and Euler diagrams
 * Generate and customize high-quality figures to depict the diagram
