@@ -4,8 +4,14 @@
 \alias{plotVenn}
 \title{Create Venn diagram using the nVenn algorithm.}
 \usage{
-plotVenn(sets, nVennObj = NULL, nCycles = 7000, sNames = NULL,
-  showPlot = T, showProgress = F, ...)
+plotVenn(
+  sets,
+  nVennObj = NULL,
+  nCycles = 7000,
+  sNames = NULL,
+  showPlot = T,
+  ...
+)
 }
 \arguments{
 \item{sets}{List of lists with the input sets.}
@@ -22,8 +28,6 @@ as a large number of cycles may take up too many resources.}
 data frames and the name exists, it will select the corresponding column.}
 
 \item{showPlot}{Show the result in the graphic device.}
-
-\item{showProgress}{Show progress bar during computation.}
 
 \item{...}{Options for `showSVG`
 If input lists have names, those names will be used for the legend. If not, names can be

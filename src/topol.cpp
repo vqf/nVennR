@@ -2,8 +2,6 @@
 #include <vector>
 #include <cmath>
 #include <time.h>
-// [[Rcpp::depends(RcppProgress)]]
-#include <progress.hpp>
 
 
 #define CIRCLE_MASS 200.0f
@@ -2071,7 +2069,7 @@ class borderLine
       string tst;
       point svgtemp;
       initPoint(&svgtemp);
-      svg.addLine("<svg width=\"700\" height=\"500\">");
+      svg.addLine("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"700\" height=\"500\">");
       svg.addLine("<defs>");
       svg.addLine("<style type=\"text/css\"><![CDATA[");
       svg.addLine("  .borderLine {");
@@ -2108,6 +2106,9 @@ class borderLine
       svg.addLine("  .legend {");
       svg.addLine("    font-family: Arial;");
       svg.addLine("    font-size: 15px;");
+      svg.addLine("  }");
+      svg.addLine("  #legendBox {");
+      svg.addLine("    display: inline;");
       svg.addLine("  }");
       for (i = 0; i < ngroups; i++){
         svg.addLine("  .p" + num(i) + "{");
@@ -2209,6 +2210,7 @@ class borderLine
       float rh = 15.0f;
       float dy = 40.0f;
       float dx = 40.0f;
+      svg.addLine("<g id=\"legendBox\">");
       for (l = 0; l < ngroups; l++){
         string g = groups[l];
         char myg[50]; sprintf(myg, "p%d", l);
@@ -2226,6 +2228,7 @@ class borderLine
         svg.addLine(addLegend);
         cy += dy;
       }
+      svg.addLine("</g>");
       svg.addLine("</svg>");
       return svg.getText();
     }
@@ -2500,7 +2503,7 @@ class borderLine
 
 
 
-    void simulate(UINT nCycles = 7e3, bool showProgress = false, int maxRel = 0)
+    void simulate(UINT nCycles = 7e3, int maxRel = 0)
     {
       UINT i;
       UINT it1 = nCycles;
@@ -2509,15 +2512,9 @@ class borderLine
       point maxP;
       initPoint(&maxP);
       udt.init(rdt);
-      Progress p(it1, showProgress); // we need an instance, should be improved in next version
-      if (showProgress == true){
-        Rprintf("Starting...\n");
-      }
       for (i = 0; i < it1; i++){
         setForces1();
         solve();
-        if (Progress::check_abort() ) return;
-        if (showProgress == true) p.increment();
 
       }
       //setForces3();
@@ -2527,21 +2524,18 @@ class borderLine
       }
       dataDisplay.clear();
     }
-    void refine(bool showProgress = false){
+    void refine(){
       UINT i;
       UINT it2 = (UINT) 2e2;
-      if (showProgress == true) Rprintf("Refining...\n");
       blSettings.lrdt = rdt / 10;
       setAsStable();
       UINT np = (UINT) (1.5f * (float) startPerim);
       interpolate(np);
       blSettings.margin /= 10;
       setRadii();
-      Progress p(it2, showProgress);
       for (i = 0; i < it2; i++){
         setForces2();
         solve(true);
-        if (showProgress == true) p.increment();
       }
     }
   };
@@ -2627,14 +2621,14 @@ borderLine* readVennInfo(List x){
 
 
 // [[Rcpp::export]]
-List makeVenn(List x, int nCycl, bool showProgress){
+List makeVenn(List x, int nCycl){
   List toret = List::create(Named("def") = x["def"]);
   borderLine* line = readVennInfo(x);
   if (x.containsElementNamed("set")){  // Previous run
     string points = Rcpp::as<std::string>(x["set"]);
     line->setCoords(points);
   }
-  line->simulate((UINT) nCycl, showProgress);
+  line->simulate((UINT) nCycl);
   toret["set"] = line->saveFigure();
   if (x.containsElementNamed("reg")) toret["reg"] = x["reg"];
   if (x.containsElementNamed("orig")) toret["orig"] = x["orig"];
@@ -2642,13 +2636,13 @@ List makeVenn(List x, int nCycl, bool showProgress){
 }
 
 // [[Rcpp::export]]
-StringVector refineVenn(List x, bool showProgress = false){
+StringVector refineVenn(List x){
   borderLine* line = readVennInfo(x);
   if (x.containsElementNamed("set")){  // Previous run
     string points = Rcpp::as<std::string>(x["set"]);
     line->setCoords(points);
   }
-  line->refine(showProgress);
+  line->refine();
   StringVector result = (line->toSVG());
   return result;
 }

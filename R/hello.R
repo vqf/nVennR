@@ -39,6 +39,7 @@ NULL
 #' @param nVennObj Object with nVennR information. Can be obtained from a plotVenn call.
 #' @param opacity Fill opacity for the sets. Defaults to 0.4.
 #' @param borderWidth Width of set borders. Defaults to 1.
+#' @param showLegend Boolean stating whether the resulting figure should contain a legend. Defaults to true.
 #' @param labelRegions Show region identifiers. These are numbers in parentheses inside each region
 #' indicating which sets that region belongs to. Defaults to true
 #' @param showNumbers Show how many elements belong to each region (large numbers in the figure).
@@ -49,19 +50,20 @@ NULL
 #' @param systemShow Show the result in the system SVG viewer (i. e., Inkscape).
 #' @param fontScale Multiplier for font sizes. The font size of both numbers and region labels will
 #' be multiplied by this factor. Values larger than 2 will probably make labels clash.
-#' @param showProgress Show progress bar during computation.
-#' @return Nothing. Creates a Venn diagram in svg as a side effect.
+#' @return Processed nVenn object. Creates a Venn diagram in svg as a side effect.
 #' @export
-showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemShow=FALSE, showProgress=FALSE,
+showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, showLegend=T, outFile='', systemShow=FALSE,
                     labelRegions=T, showNumbers=T, setColors=NULL, fontScale=1){
   nSets <- nVennObj$def[[2]]
+  dleg <- ifelse(showLegend, "inline", "none")
   tfile = outFile
   if (tfile == "") tfile <- tempfile(fileext = ".svg")
   tfile2 <- tempfile(fileext = ".svg")
-  nVennObj$svg <- refineVenn(nVennObj, showProgress)
+  nVennObj$svg <- refineVenn(nVennObj)
   # transform SVG
   nVennObj$svg <- sub("fill-opacity: *([^ ;]+) *;", paste("fill-opacity: ", opacity, ";"), nVennObj$svg)
   nVennObj$svg <- sub("stroke-width: *([^ ;]+) *;", paste("stroke-width: ", borderWidth, ";"), nVennObj$svg)
+  nVennObj$svg <- sub("display: *([^ ;]+) *;", paste("display: ", dleg, ";"), nVennObj$svg)
   if (!labelRegions){
     nVennObj$svg <- sub("belong *\\{", paste("belong \\{", "\n", "display: none;"), nVennObj$svg)
   }
@@ -87,71 +89,28 @@ showSVG <- function(nVennObj, opacity=0.4, borderWidth = 1, outFile='', systemSh
   #print(nVennObj$svg)
   ###############
   cat(nVennObj$svg, file=tfile)
-  rsvg::rsvg_svg(svg = tfile, tfile2)
-  #s <- magick::image_read(tfile)
-  #print(s)
-  p <- grImport2::readPicture(tfile2)
-  grImport2::grid.picture(p)
+  if (requireNamespace("rsvg", quietly = TRUE) && requireNamespace("grImport2", quietly = TRUE)) {
+    out <- tryCatch(
+      {
+        rsvg::rsvg_svg(svg = tfile, tfile2)
+        p <- grImport2::readPicture(tfile2)
+        grImport2::grid.picture(p)
+      },
+      error=function(cond){
+        message(paste("rsvg or grImport2 reported an error: ", cond))
+        message("The figure cannot be rendered in the plot window. Please, use the arguments outFile and/or systemShow.")
+      }
+    )
+  } else {
+    if (systemShow == FALSE && outFile == ''){
+      message("The figure cannot be rendered in the plot window. Please, use the arguments outFile and/or systemShow.")
+    }
+  }
   if (systemShow){
     utils::browseURL(tfile)
   }
-  #cat("Saved to ", tfile)
+  return(nVennObj)
 }
-
-#' This function is deprecated, only kept for backward compatibility.
-#'
-#' Please, use plotVenn instead. Please, notice that input and output are different.
-#'
-#' @param draw Show Venn diagram in the viewer as a side effect. Defaults to true.
-#' @param ... One list or vector (possibly mixed) per set. If the input
-#' is a list with a name, that name will be used for the legend.
-#' @return SVG code for the Venn diagram.
-#' @examples
-#' set1 <- c('a', 'b', 'c')
-#' set2 <- c('e', 'f', 'c')
-#' set3 <- c('c', 'b', 'e')
-#' mySVG <- toVenn(set1, set2, set3)
-#' oldShowSVG(mySVG=mySVG, opacity=0.2)
-#' @export
-toVenn <- function(..., draw=TRUE){
-  sets <- list(...)
-  nBits <- length(sets)
-  nRegions <- bitwShiftL(1, nBits)
-  result <- c("nVenn1.2", toString(nBits))
-  for (i in 1:nBits){
-    cname <- paste('name', i, sep='')
-    if (length(names(sets[[i]])) > 0){
-      cname <- names(sets[[i]])
-    }
-    result <- c(result, cname)
-  }
-  al <- unlist(sets[[1]])
-  for (i in 2:nBits){
-    al <- union(al, unlist(sets[[i]]))
-  }
-  result <- c(result, toString(0))
-  for (i in 1:(nRegions - 1)){
-    start <- al
-    belongs <- .toBin(i, nBits)
-    for (j in 1:length(belongs)){
-      k <- belongs[[j]]
-      if (k == 1){
-        start <- intersect(start, unlist(sets[[j]]))
-      }
-      else{
-        start <- setdiff(start, unlist(sets[[j]]))
-      }
-    }
-    result <- c(result, length(start))
-  }
-  cat(result, sep="\n")
-  tmp <- result
-  mySVG <- drawVenn(tmp)
-  if (draw) oldShowSVG(mySVG)
-  return(mySVG)
-}
-
-
 
 
 #' Create Venn diagram using the nVenn algorithm.
@@ -170,7 +129,6 @@ toVenn <- function(..., draw=TRUE){
 #' should be enough. Even for more complex scenarios, it may be better to run the function repeatedly,
 #' as a large number of cycles may take up too many resources.
 #' @param showPlot Show the result in the graphic device.
-#' @param showProgress Show progress bar during computation.
 #' @param sets List of lists with the input sets.
 #' @param ... Options for `showSVG`
 #' If input lists have names, those names will be used for the legend. If not, names can be
@@ -185,7 +143,7 @@ toVenn <- function(..., draw=TRUE){
 #' showSVG(myNV, opacity=0.2)
 #' @export
 plotVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
-                     showPlot=T, showProgress=F, ...){
+                     showPlot=T, ...){
   lresult <- NULL
   if (is.null(nVennObj)){
     sets <- .flattenInput(sets, sNames=sNames)
@@ -203,9 +161,9 @@ plotVenn <- function(sets, nVennObj=NULL, nCycles=7000, sNames=NULL,
     message("All regions are zero. The resulting diagram will probably be blank.")
     message("If you still want the diagram, you can set nCycles to zero.")
   }
-  myVenn <- makeVenn(lresult, nCycles, showProgress)
+  myVenn <- makeVenn(lresult, nCycles)
   class(myVenn) <- append(class(myVenn), "nVennObj")
-  if (showPlot == T) showSVG(myVenn, showProgress = showProgress, ...)
+  if (showPlot == T) myVenn <- showSVG(myVenn, ...)
   return(myVenn)
 }
 
@@ -457,28 +415,4 @@ createVennObj <- function(nSets=1, sNames=NULL, sSizes=NULL){
     result <- result + b
   }
   return(result)
-}
-
-#' Only exported for backwards compatibility with toVenn
-
-#' @param mySVG SVG code defining the diagram. Can be retrieved from toVenn.
-#' @param opacity Fill opacity for the sets. Defaults to 0.4.
-#' @param outFile File name to save SVG figure. If empty, a temp file will be created and
-#' shown in the viewer, if possible.
-#' @param systemShow Show the result in the system SVG viewer.
-#' @return Nothing. Creates a Venn diagram in svg as a side effect.
-#' @export
-oldShowSVG <- function(mySVG, opacity=0.4, outFile='', systemShow=FALSE){
-  tfile = outFile
-  if (tfile == "") tfile <- tempfile(fileext = ".svg")
-  # transform SVG
-  mySVG <- sub("fill-opacity: *([^ ;]+) *;", paste("fill-opacity: ", opacity, ";"), mySVG)
-  ###############
-  cat(mySVG, file=tfile)
-  s <- magick::image_read(tfile)
-  print(s)
-  if (systemShow){
-    utils::browseURL(tfile)
-  }
-  #cat("Saved to ", tfile)
 }
