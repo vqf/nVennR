@@ -6,6 +6,7 @@
 - Travis-CI x86_64-pc-linux-gnu (64-bit) R version 3.6.3 (2020-02-29)
 - Travis-CI x86_64x86_64-pc-linux-gnu (64-bit) R version 4.0.2 (2020-06-22)
 - Travis-CI x86_64-pc-linux-gnu (64-bit) R Under development (unstable) (2021-01-21 r79854)
+- R CMD x86_64-w64-mingw32/x64 (64-bit) R version 4.0.1 (2020-06-06)
 
 ## R CMD check results
 
