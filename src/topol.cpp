@@ -1897,13 +1897,6 @@ class borderLine
       return bl;
     }
 
-    void quack(){
-      UINT i = 0;
-      Rprintf("%d groups:\n", bl.size());
-      for (i = 0; i < bl.size(); i++){
-        Rprintf("\tGroup %d: %d points\n", i, bl[i].size());
-      }
-    }
 
     std::vector<std::string> split_string(const std::string& str,
                                           const std::string& delimiter)
