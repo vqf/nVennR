@@ -696,7 +696,7 @@ class borderLine
   vector<point> warn;
   scale internalScale;
   int totalExpectedSurface;
-  vector<char*> dataDisplay;
+  vector<std::string> dataDisplay;
   timeMaster udt;
   blData blSettings;
   float minRat;
@@ -737,47 +737,30 @@ class borderLine
   }
 
 
-  string float2string(float f){
-    char* dsp = (char*) calloc(100, sizeof(char));
-    if (dsp){
-      sprintf(dsp, "%g", f);
-      string result(dsp);
-      free(dsp);
-      return result;
-    }
-    return "Error";
-  }
 
-  string UINT2string(UINT f){
-    char* dsp = (char*) calloc(100, sizeof(char));
-    if (dsp){
-      sprintf(dsp, "%u", f);
-      string result(dsp);
-      free(dsp);
-      return result;
-    }
-    return "Error";
-  }
-
-  string bool2string(bool f){
-    string result = f ? "1" : "0";
+  std::string float2string(float f){
+    std::string result = vformat("%g", f);
     return result;
   }
 
-  void displayFloat(string label, float d){
-    char* dsp = (char*) calloc(100, sizeof(char));
-    if (dsp){
-      sprintf(dsp, "%s: %g", label.c_str(), d);
-      dataDisplay.insert(dataDisplay.end(), dsp);
-    }
+  std::string UINT2string(UINT f){
+    std::string result = vformat("%u", f);
+    return result;
   }
 
-  void displayUINT(string label, UINT d){
-    char* dsp = (char*) calloc(100, sizeof(char));
-    if (dsp){
-      sprintf(dsp, "%s: %u", label.c_str(), d);
-      dataDisplay.insert(dataDisplay.end(), dsp);
-    }
+  std::string bool2string(bool f){
+    std::string result = f ? "1" : "0";
+    return result;
+  }
+
+  void displayFloat(std::string label, float d){
+    std::string dsp = vformat("%s: %g", label.c_str(), d);
+    dataDisplay.push_back(dsp);
+  }
+
+  void displayUINT(std::string label, UINT d){
+    std::string dsp = vformat("%s: %u", label.c_str(), d);
+    dataDisplay.push_back(dsp);
   }
 
   rgb toRGB(int color, int max)
@@ -1555,9 +1538,6 @@ class borderLine
   {
     UINT i;
     float kb = baseBV;
-    for (i = 0; i < dataDisplay.size(); i++){
-      free(dataDisplay[i]);
-    }
     dataDisplay.clear();
 
     //Init the scale for the new frame
@@ -1877,9 +1857,8 @@ class borderLine
         0x000000
       };
       for (i = 0; i < ngroups; i++){
-        char c[8];
-        sprintf(c, "#%06x", arr[i]);
-        svgcolors.insert(svgcolors.end(), c);
+        std::string c = vformat("#%06x", arr[i]);
+        svgcolors.insert(svgcolors.end(), c.c_str());
       }
       //init colors
       for (i = 0; i < ngroups; i++)
@@ -2007,19 +1986,46 @@ class borderLine
     }
 
 
-    string coord(float c){
-      char t[500];
-      sprintf(t, "%.2f", c);
-      string result = t;
+    /** \brief Safe replacement for sprintf
+     *
+     * \param const char * const zcFormat
+     * \param ...
+     * \return const std::string
+     *
+     */
+    const std::string vformat(const char * const zcFormat, ...) {
+
+      // initialize use of the variable argument array
+      va_list vaArgs;
+      va_start(vaArgs, zcFormat);
+
+      // reliably acquire the size
+      // from a copy of the variable argument array
+      // and a functionally reliable call to mock the formatting
+      va_list vaArgsCopy;
+      va_copy(vaArgsCopy, vaArgs);
+      const int iLen = std::vsnprintf(NULL, 0, zcFormat, vaArgsCopy);
+      va_end(vaArgsCopy);
+
+      // return a formatted string without risking memory mismanagement
+      // and without assuming any compiler or platform specific behavior
+      std::vector<char> zc(iLen + 1);
+      std::vsnprintf(zc.data(), zc.size(), zcFormat, vaArgs);
+      va_end(vaArgs);
+      return std::string(zc.data(), iLen);
+    }
+
+    std::string coord(float c){
+      std::string result = vformat("%.2f", c);
       return result;
     }
 
-    string num(int c){
-      char t[500];
-      sprintf(t, "%d", c);
-      string result = t;
+    std::string num(int c){
+      std::string result = vformat("%d", c);
+
       return result;
     }
+
 
     point fstCtrlPoint(point prev, point start, point nxt, float sc = 0.5f){
       point result;
@@ -2082,17 +2088,16 @@ class borderLine
       svg.addLine("  .nLabel {");
       svg.addLine("	   font-family: Arial;");
       svg.addLine("    pointer-events: none;");
-      char t[200];
-      sprintf(t, "	   font-size: %dpx;", fsize);
-      svg.addLine((string) t);
+      std::string fs1 = "	   font-size: " + num(fsize) + "px;";
+      svg.addLine(fs1);
       svg.addLine("	   text-anchor: middle;");
       svg.addLine("	   alignment-baseline: central;");
       svg.addLine("  }");
       svg.addLine("  .belong {");
       svg.addLine("	   font-family: Arial;");
       svg.addLine("    pointer-events: none;");
-      sprintf(t, "	   font-size: %dpx;", fsize / 2);
-      svg.addLine((string) t);
+      std::string fs = "	   font-size: " + num(fsize / 2) + "px;";
+      svg.addLine(fs);
       svg.addLine("	   text-anchor: middle;");
       svg.addLine("	   alignment-baseline: central;");
       svg.addLine("  }");
@@ -2169,13 +2174,10 @@ class borderLine
           svgtemp = place(sc, circles[i]);
           //printf("%.4f, %.4f, %.4f\n", svgtemp.x, sc.minX, sc.maxX);
           if (svgtemp.x > sc.minX() && svgtemp.x < sc.maxX()){
-            sprintf(temp, "<circle onclick=\"fromCircle(%u)\" class=\"circle\" cx=\"%.4f\" cy=\"%.4f\" r=\"%.4f\" />", circles[i].n, svgtemp.x,
-                    svgtemp.y, svgtemp.radius);
-            tst = temp;
+            tst = vformat("<circle onclick=\"fromCircle(%u)\" class=\"circle\" cx=\"%.4f\" cy=\"%.4f\" r=\"%.4f\" />", circles[i].n, svgtemp.x,
+                          svgtemp.y, svgtemp.radius);
             svg.addLine(tst);
-            char addNum[200];
-            sprintf(addNum, "<text class=\"nLabel\" x=\"%.2f\" y=\"%.2f\">%g</text>", svgtemp.x, svgtemp.y - fsize/2, circles[i].orig);
-            tst = addNum;
+            tst = vformat("<text class=\"nLabel\" x=\"%.2f\" y=\"%.2f\">%g</text>", svgtemp.x, svgtemp.y - fsize/2, circles[i].orig);
             svg.addLine(tst);
             // Belongs to
             vector<int> tb = toBin(circles[i].n, bl.size());
@@ -2183,14 +2185,12 @@ class borderLine
             UINT m;
             for (m = 0; m < tb.size(); m++){
               if (tb[m] > 0){
-                char t[100];
-                sprintf(t, "%d", m + 1);
-                belongs.insert(belongs.end(), (string) t);
+                std::string t = vformat("%d", m + 1);
+                belongs.insert(belongs.end(), t);
               }
             }
             string bgs = join(", ", belongs);
-            char addBelongs[500];
-            sprintf(addBelongs, "<text class=\"belong\" x=\"%.2f\" y=\"%.2f\">(%s)</text>", svgtemp.x, svgtemp.y + fsize / 2, bgs.c_str());
+            std::string addBelongs = vformat("<text class=\"belong\" x=\"%.2f\" y=\"%.2f\">(%s)</text>", svgtemp.x, svgtemp.y + fsize / 2, bgs.c_str());
             svg.addLine(addBelongs);
           }
         }
@@ -2206,16 +2206,13 @@ class borderLine
       svg.addLine("<g id=\"legendBox\">");
       for (l = 0; l < ngroups; l++){
         string g = groups[l];
-        char myg[50]; sprintf(myg, "p%d", l);
-        char myq[50]; sprintf(myq, "q%d", l);
-        char addRect[500];
-        char addQrect[500];
-        sprintf(addRect, "<rect class=\"%s borderLine\" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" />",
-                myg, cx, cy, rw, rh);
-        sprintf(addQrect, "<rect class=\"%s\" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" />",
-                myq, cx, cy, rw, rh);
-        char addLegend[500];
-        sprintf(addLegend, "<text class=\"legend\" x=\"%.2f\" y=\"%.2f\">%s</text>", cx + dx, cy + rh, g.c_str());
+        std::string myg = "p" + num(l); //vformat("p%d", l);
+        std::string myq = "q" + num(l); //vformat("q%d", l);
+        std::string addRect = vformat("<rect class=\"%s borderLine\" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" />",
+                myg.c_str(), cx, cy, rw, rh);
+        std::string addQrect = vformat("<rect class=\"%s\" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" />",
+                myq.c_str(), cx, cy, rw, rh);
+        std::string addLegend = vformat("<text class=\"legend\" x=\"%.2f\" y=\"%.2f\">%s</text>", cx + dx, cy + rh, g.c_str());
         svg.addLine(addRect);
         svg.addLine(addQrect);
         svg.addLine(addLegend);
@@ -2311,10 +2308,8 @@ class borderLine
       pstext.addLine("/b exch def");
       pstext.addLine("/g exch def");
       pstext.addLine("/r exch def");
-      char* st = (char*) calloc(100, sizeof(char));
-      sprintf(st, "/step %u def", ngroups);
+      std::string st = vformat("/step %u def", ngroups);
       pstext.addLine(st);
-      free(st);
       pstext.addLine("offsetx llx add step urx offsetx add{");
       pstext.addLine("/x exch def");
       pstext.addLine(" offsety lly add step ury offsety add{");
@@ -2362,18 +2357,13 @@ class borderLine
         for (j = 0; j < bl[i].size(); j++)
         {
           pstemp = place(ps, bl[i][j]);
-          sprintf(temp, "%f %f", pstemp.x, pstemp.y);
-          tst = temp;
+          tst = vformat("%f %f", pstemp.x, pstemp.y);
           pstext.addLine(tst);
         }
-        sprintf(temp, "]");
-        tst = temp;
+        pstext.addLine("]");
+        tst = vformat("/set%d exch def", i + 1);
         pstext.addLine(tst);
-        sprintf(temp, "/set%d exch def", i + 1);
-        tst = temp;
-        pstext.addLine(tst);
-        sprintf(temp, "set%d minmax", i + 1);
-        tst = temp;
+        tst = vformat("set%d minmax", i + 1);
         pstext.addLine(tst);
         pstext.addLine(" ");
       }
@@ -2387,13 +2377,11 @@ class borderLine
       for (i = 0; i < ngroups; i++)
       {
         pstext.addLine("gsave");
-        sprintf(temp, "set%d topath", i+1);
-        tst = temp;
+        tst = vformat("set%d topath", i+1);
         pstext.addLine(tst);
         pstext.addLine("clip");
-        sprintf(temp, "%f %f %f %u %u colorpattern", colors[i].red,
+        tst = vformat("%f %f %f %u %u colorpattern", colors[i].red,
                 colors[i].green, colors[i].blue, offset, offset);
-        tst = temp;
         pstext.addLine(tst);
         pstext.addLine("grestore");
         offset++;
@@ -2402,9 +2390,8 @@ class borderLine
 
       for (i = 0; i < ngroups; i++)
       {
-        sprintf(temp, "%f %f %f set%d showline", colors[i].red,
+        tst = vformat("%f %f %f set%d showline", colors[i].red,
                 colors[i].green, colors[i].blue, i+1);
-        tst = temp;
         pstext.addLine(tst);
       }
       pstext.addLine(" ");
@@ -2415,9 +2402,8 @@ class borderLine
           pstemp = place(ps, circles[i]);
           pstext.addLine("newpath");
           if (pstemp.x > ps.minX() && pstemp.x < ps.maxX()){
-            sprintf(temp, "%f %f %f 0 360 arc", pstemp.x,
+            tst = vformat("%f %f %f 0 360 arc", pstemp.x,
                     pstemp.y, pstemp.radius);
-            tst = temp;
             pstext.addLine(tst);
             pstext.addLine("0.2 setlinewidth");
             pstext.addLine("1 0 0 setrgbcolor");
@@ -2512,9 +2498,6 @@ class borderLine
       }
       //setForces3();
       UINT counter;
-      for (counter = 0; counter < dataDisplay.size(); counter++){
-        free(dataDisplay[counter]);
-      }
       dataDisplay.clear();
     }
     void refine(){

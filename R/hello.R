@@ -227,7 +227,7 @@ setVennRegion <- function(nVennObj, region, value){
   r <- .fromBin(reg)
   nSets <- as.numeric(nVennObj$def[[2]])
   offset <- nSets + 3
-  if (class(value) != "numeric"){
+  if (!is.numeric(value)){
     value <- 0
     message("Value must be numeric. It has been set to 0.")
   }
@@ -304,7 +304,7 @@ createVennObj <- function(nSets=1, sNames=NULL, sSizes=NULL){
   sets <- as.list(nVennObj$def[3:topGroups])
   nGroups <- .getNBits(sets)
   reg <- vector(length = nGroups, mode = "numeric")
-  if (class(region) == "character"){
+  if (is.character(region)){
     for (s in region){
       pos <- match(s, sets)
       if (is.na(pos)){
@@ -337,7 +337,7 @@ createVennObj <- function(nSets=1, sNames=NULL, sSizes=NULL){
   oNames <- names(sets)
   onNames <- length(names(sets))
   i <- 1
-  if (class(sets) != "list"){
+  if (!is.list(sets)){
     stop("Input must be a list of lists")
   }
   else{
