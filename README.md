@@ -5,8 +5,8 @@
 
 <!-- badges: start -->
 
-[![Build
-Status](https://travis-ci.com/vqf/nVennR.svg?branch=master)](https://travis-ci.com/vqf/nVennR)
+[![R-hub](https://github.com/vqf/nVennR/actions/workflows/rhub.yaml/badge.svg)](https://github.com/vqf/nVennR/actions/workflows/rhub.yaml)
+
 <!-- badges: end -->
 
 nVennR provides an R interface to the [nVenn
