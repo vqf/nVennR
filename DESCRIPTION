@@ -5,7 +5,8 @@ Version: 0.2.4
 Authors@R: person("Victor", "Quesada", email = "quesadavictor@uniovi.es", role=c("aut", "cre", "cph"))
 Author: Victor Quesada [aut, cre, cph]
 Maintainer: Victor Quesada <quesadavictor@uniovi.es>
-Description: Please, be aware that a second version of this package (nVennR2) is also available. 
+Description: Please, be aware that a second version of this package (nVennR2) is also available
+    (<https://github.com/vqf/nVennR2>). 
     The second version is faster and gives better results in most cases. This first version is intended
     mainly for fringe cases and users who have incorporated this algorithm into their procedures.
     Provides an interface for the "nVenn"" algorithm (Perez-Silva, Araujo-Voces and Quesada (2018), 
