@@ -190,6 +190,7 @@ getVennRegion <- function(nVennObj, region){
 #'
 #' @param nVennObj Object to list.
 #' @param na.rm If true, empty regions are not listed.
+#' @return list of regions with the corresponding objects
 #' @export
 listVennRegions <- function(nVennObj, na.rm=T){
   nBits <- as.integer(nVennObj$def[[2]])

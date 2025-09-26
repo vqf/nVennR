@@ -11,6 +11,9 @@ listVennRegions(nVennObj, na.rm = T)
 
 \item{na.rm}{If true, empty regions are not listed.}
 }
+\value{
+list of regions with the corresponding objects
+}
 \description{
 List elements in every region
 }

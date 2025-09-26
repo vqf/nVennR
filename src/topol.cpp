@@ -1536,7 +1536,6 @@ class borderLine
 
   void solve(bool resetVelocity = false)
   {
-    UINT i;
     float kb = baseBV;
     dataDisplay.clear();
 
@@ -2056,7 +2055,6 @@ class borderLine
 
     string toSVG(){
       fileText svg;
-      char temp[512];
       scale sc;
       sc.initScale();
       sc.setMinX(10.0f);
@@ -2226,7 +2224,6 @@ class borderLine
     fileText toPS()
     {
       fileText pstext;
-      char temp[512];
       string tst;
       UINT i, j;
       point pstemp;
@@ -2497,7 +2494,6 @@ class borderLine
 
       }
       //setForces3();
-      UINT counter;
       dataDisplay.clear();
     }
     void refine(){
