@@ -2615,6 +2615,6 @@ StringVector refineVenn(List x){
     line->setCoords(points);
   }
   line->refine();
-  StringVector result = (line->toSVG());
+  StringVector result = line->toSVG();
   return result;
 }
