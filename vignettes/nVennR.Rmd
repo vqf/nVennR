@@ -14,6 +14,52 @@ editor_options:
 ---
 
 
+```{r setup, F, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.show='hide'
+)
+library(knitr)
+uuid <- function() {
+  hex_digits <- c(as.character(0:9), letters[1:6])
+  hex_digits <- toupper(hex_digits)
+  paste(sample(hex_digits, 8), collapse='')
+}
+
+subsuid <- function(regex, strng){
+  l <- gregexpr(regex, strng, perl = T)
+  for (x in regmatches(strng, l)){ 
+    m <- regexpr('([^\\{ \\.\\#]+)', x, perl = T)
+    names <- regmatches(x, m)
+    gstr = strng
+    for (name in names){
+      nname <- paste('([^\\d\\w<>]', name, ')', sep="")
+      gstr <- gsub(nname, paste('\\1', '_', uuid(), sep=""), gstr, perl = T) 
+    }
+    return(gstr)
+  }
+}
+
+knit_print.nVennR = function(x, ...) {
+  if (is.null(x$svg)){
+    x <- showSVG(x)
+  }
+  s <- subsuid('[\\.\\#](.+?)\\s*\\{', x$svg)
+  s <- subsuid('bl\\d+', s)
+  knitr::asis_output(s)
+}
+# register the method
+registerS3method("knit_print", "nVennObj", knit_print.nVennR)
+local({
+  hook_source <- knitr::knit_hooks$get('source')
+  knitr::knit_hooks$set(source = function(x, options) {
+    x <- x[!grepl('#noshow$', x)]
+    hook_source(x, options)
+  })
+})
+```
+
 nVennR provides an R interface to the [nVenn algorithm](https://academic.oup.com/bioinformatics/article/34/13/2322/4904268). This vignette intends to illustrate three basic uses of nVennR:
 
 * Create Venn and Euler diagrams
@@ -34,5 +80,6 @@ sas <- subset(exampledf, SAS == "Y")$Employee
 python <- subset(exampledf, Python == "Y")$Employee
 rr <- subset(exampledf, R == "Y")$Employee
 myV <- plotVenn(list(SAS=sas, PYTHON=python, R=rr), nCycles = 2000)
+myV #noshow
 
 ```
