@@ -92,3 +92,18 @@ myV2 <- plotVenn(nVennObj = myV2)
 myV2 #noshow
 
 ```
+
+### Low-level
+Users can also build an nVennObj from scratch. Most of the time, this will not be useful, but it might have some theoretical applications. For instance, let us get a five-set Venn diagram (in Venn diagrams, all the regions are shown). With the high-level procedure, we would need five sets with all the possible intersections. Instead, we can use `createVennObj`:
+
+```{r "Low-level"}
+myV3 <- createVennObj(nSets = 5, sSizes = c(rep(1, 32)))
+myV3 <- plotVenn(nVennObj = myV3, nCycles = 5000)
+myT <- myV3 #noshow
+```
+
+```{r}
+myV3 <- plotVenn(nVennObj = myV3, nCycles = 5000)
+myT #noshow
+myV3 #noshow
+```
