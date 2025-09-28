@@ -249,7 +249,7 @@ setVennRegion <- function(nVennObj, region, value){
 #' of the regions, those values are sorted according to the number describing the region. Thus, with
 #' four sets, the first element corresponds to region 0 (0000), the second to region 1 (0001), the third
 #' to region 2 (0010), ... The last corresponds to region 15 (1111), which belongs to all the sets.
-#' @return nVennObj with set information. To plot, it must be sent to `toVenn`. Sending it to `showSVG`
+#' @return nVennObj with set information. To plot, it must be sent to `plotVenn`. Sending it to `showSVG`
 #' will render the diagram before simulation.
 #' @export
 createVennObj <- function(nSets=1, sNames=NULL, sSizes=NULL){
