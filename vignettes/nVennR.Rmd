@@ -99,9 +99,7 @@ Users can also build an nVennObj from scratch. Most of the time, this will not b
 ```{r "Low-level"}
 myV3 <- createVennObj(nSets = 5, sSizes = c(rep(1, 32)))
 myV3 <- plotVenn(nVennObj = myV3, nCycles = 5000)
-myT <- myV3 #noshow
 myV3 <- plotVenn(nVennObj = myV3, nCycles = 5000)
-myT #noshow
 myV3 #noshow
 ```
 
